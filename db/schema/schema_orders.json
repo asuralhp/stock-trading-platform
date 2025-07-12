@@ -1,0 +1,24 @@
+{
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": [
+            "order_id", "userUid", "symbol", "order_type", 
+            "action", "amount", "price", "order_date", 
+            "status", "session", "time_in_force"
+        ],
+        "properties": {
+            "order_id": {"bsonType": "string"},
+            "userUid": {"bsonType": "string"},
+            "symbol": {"bsonType": "string"},
+            "order_type": {"bsonType": "string", "enum": ["limit", "market"]},
+            "action": {"bsonType": "string", "enum": ["buy", "sell"]},
+            "amount": {"bsonType": "int", "minimum": 1},
+            "price": {"bsonType": ["double", "null"], "minimum": 0},
+            "order_date": {"bsonType": "date"},
+            "trade_date": {"bsonType": ["date", "null"]},
+            "status": {"bsonType": "string", "enum": ["pending", "completed", "canceled"]},
+            "session": {"bsonType": "string", "enum": ["regular", "after-hours"]},
+            "time_in_force": {"bsonType": "string", "enum": ["DAY", "GTC", "FOK", "IOC"]}
+        }
+    }
+}

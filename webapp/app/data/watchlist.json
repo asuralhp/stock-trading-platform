@@ -1,0 +1,38 @@
+{
+  "userUid": "johndoe",
+  "watchlist": [
+    {
+      "name": "WatchA",
+      "stocks": [
+        {
+          "symbol": "AAPL"
+        },
+        {
+          "symbol": "NVDA"
+        }
+      ]
+    },
+    {
+      "name": "WatchB",
+      "stocks": [
+        {
+          "symbol": "TSLA"
+        },
+        {
+          "symbol": "AMZN"
+        }
+      ]
+    },
+    {
+      "name": "WatchC",
+      "stocks": [
+        {
+          "symbol": "GOOGL"
+        },
+        {
+          "symbol": "NFLX"
+        }
+      ]
+    }
+  ]
+}

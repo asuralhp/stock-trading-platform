@@ -9,9 +9,10 @@ const ChatSlot: React.FC = () => {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
 
   const handleSend = async (text: string) => {
-    const newMessage = { text, sender: 'You' };
-    await callAgent(text);
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    const Question = { text, sender: 'You' };
+    setMessages((prevMessages) => [...prevMessages, Question]);
+    const answer = await callAgent(text);
+    setMessages((prevMessages) => [...prevMessages, { text: answer, sender: 'AI' }]);
   };
 
   return (

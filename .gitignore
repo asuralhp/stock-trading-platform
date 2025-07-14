@@ -21,7 +21,8 @@ yarn.lock
 coverage
 test-results
 
-
+.idx
+.idx/*
 .venv
 docapp/node_modules
 docapp/node_modules/*

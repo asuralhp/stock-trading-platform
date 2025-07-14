@@ -1,4 +1,5 @@
 import { fetchData, Post } from '../api/data';
+import ChatSlot from '../components/ChatSlot';
 
 
 
@@ -7,6 +8,7 @@ export default async function Contact()  {
 
     return (
         <div>
+            <ChatSlot />
             <h1>Posts</h1>
             <ul>
                 {posts.map(post => (

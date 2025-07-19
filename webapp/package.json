@@ -17,7 +17,6 @@
     "@langchain/google-genai": "^0.2.14",
     "@langchain/google-vertexai": "^0.2.14",
     "@langchain/openai": "^0.5.18",
-    "chromadb": "^3.0.9",
     "d3": "^7.9.0",
     "langchain": "^0.3.29",
     "lodash": "^4.17.21",

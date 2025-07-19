@@ -1,6 +1,6 @@
-import { callAgent } from "./crud";
+import { llmBot } from "./crud";
 
 export async function GET(req: Request) {
-  const result = await callAgent();
+  const result = await llmBot();
   return new Response(result);
 }

@@ -55,15 +55,18 @@ def batch_process(path_documents):
     cleaned_texts = [preprocess_text(text) for text in text_list]
     store_in_chroma(cleaned_texts)
 
+def query_collection(question,n):
+    result = collection.query(
+        query_texts=[question],
+        n_results=n
+    )
+    return result
 
 if __name__ == "__main__":
     batch_process(GLOVAR.PATH_DOCUMENTS)
     print("Texts have been processed and stored in Chroma!")
-    query_text = "What stationery does Ken have?"  
-    print("Querying Chroma for:", query_text)
-    result = collection.query(
-        query_texts=[query_text],
-        n_results=1
-    )
-
-    print("Query result:", result['documents'])  
+    question = "How many stationery does Mary have?"  
+    print("Test Querying Chroma for:", question)
+    result = query_collection(question,4)
+    print("Query result:", result)  
+    print("\n".join(result['documents'][0]))

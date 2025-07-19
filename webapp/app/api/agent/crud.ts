@@ -9,8 +9,7 @@ import { pull } from "langchain/hub";
 import { ChatPromptTemplate, PromptTemplate } from "@langchain/core/prompts";
 import { DynamicTool } from 'langchain/tools';
 import { createReactAgent, AgentExecutor } from 'langchain/agents';
-
-
+// "../../../../vecdb/chromadb"
 
 const model = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash",
@@ -18,7 +17,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 
-export async function callAgent(input: string, context: string): Promise<string> {
+export async function llmBot(input: string, context: string): Promise<string> {
 
 
   const prompt = ChatPromptTemplate.fromMessages([
@@ -40,37 +39,39 @@ export async function callAgent(input: string, context: string): Promise<string>
 const embeddings = new GoogleGenerativeAIEmbeddings({
   model: "text-embedding-004",
   taskType: TaskType.RETRIEVAL_DOCUMENT,
-  title: "Document title",
+  title: "Document Baisc",
 });
 
 // Sample documents with multiple contexts
-const docs = [
-  { pageContent: "Apple Inc. (AAPL) has a market cap of $2.5 trillion", metadata: { author: "Alice" } },
-  { pageContent: "Tesla Inc. (TSLA) has a market cap of $800 billion", metadata: { author: "Bob" } },
-  { pageContent: "Amazon.com Inc. (AMZN) has a market cap of $1.7 trillion", metadata: { author: "Charlie" } },
-];
+// const docs = [
+//   { pageContent: "Apple Inc. (AAPL) has a market cap of $2.5 trillion", metadata: { author: "Alice" } },
+//   { pageContent: "Tesla Inc. (TSLA) has a market cap of $800 billion", metadata: { author: "Bob" } },
+//   { pageContent: "Amazon.com Inc. (AMZN) has a market cap of $1.7 trillion", metadata: { author: "Charlie" } },
+// ];
 
-let vectorstore: MemoryVectorStore;
+// let vectorstore: MemoryVectorStore;
 
-async function initializeVectorStore() {
-  vectorstore = await MemoryVectorStore.fromDocuments(docs, embeddings);
-}
+// async function initializeVectorStore() {
+//   vectorstore = await MemoryVectorStore.fromDocuments(docs, embeddings);
+// }
 
-export async function ragAgent(input: string): Promise<string> {
-  const retriever = vectorstore.asRetriever(1);
-  const retrievedDocuments = await retriever.invoke(input);
 
-  const retrive = retrievedDocuments[0]?.pageContent || "No relevant information found.";
 
-  const result = await callAgent(input, retrive)
+export async function ragBot(input: string): Promise<string> {
+  // const retriever = vectorstore.asRetriever(1);
+  // const retrievedDocuments = await retriever.invoke(input);
+
+  // const retrive = retrievedDocuments[0]?.pageContent || "No relevant information found.";
+
+  // start server on /vecdb/server.py first
+  const retrive = await fetch('http://localhost:8181/retrive?question=' + encodeURIComponent(input));
+  const result = await llmBot(input, await retrive.text());
   console.log(result);
 
   return result;
 }
 
-// initializeVectorStore().then(() => {
-//   ragAgent("How much of Apple market cap ? ");
-// });
+ragBot("How many stationary does Ken have? ");
 
 
 
@@ -86,7 +87,7 @@ const tools = [
  })
 ];
 
-async function runAgent() {
+async function agentBot() {
   const systemMessage = `
 Answer the following questions as best you can. You have access to the following tools: {tools}.
 You are a helpful brokerage assistant; Based on the retrieved information, respond appropriately.
@@ -125,10 +126,10 @@ Avoid error : OutputParserException [Error]: Could not parse LLM output
     input: "Buy 2123 NVDA 30$",
   })
 
-  const out = await callAgent(result.output,"extract the value in response in output with plain string");
+  const out = await llmBot(result.output,"extract the value in response in output with plain string");
 
   
   return out
 }
 
-runAgent();
+// runAgent();

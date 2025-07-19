@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import Chat from './Chat';
 import ChatInput from './ChatInput';
-import { callAgent } from '@/app/api/agent/crud';
+import { llmBot } from '@/app/api/agent/crud';
 
 const ChatSlot: React.FC = () => {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
@@ -11,7 +11,7 @@ const ChatSlot: React.FC = () => {
   const handleSend = async (text: string) => {
     const Question = { text, sender: 'You' };
     setMessages((prevMessages) => [...prevMessages, Question]);
-    const answer = await callAgent(text);
+    const answer = await llmBot(text);
     setMessages((prevMessages) => [...prevMessages, { text: answer, sender: 'AI' }]);
   };
 

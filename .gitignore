@@ -28,3 +28,10 @@ docapp/node_modules
 docapp/node_modules/*
 webapp/node_modules
 webapp/node_modules/*
+
+**/*.pyc
+**/*.pyo
+**/__pycache__/
+
+vecdb/chromadb/
+vecdb/chromadb/*

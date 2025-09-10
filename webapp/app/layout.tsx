@@ -1,9 +1,11 @@
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+// import "./globals.css";
+import "./Global.scss";
 import Link from 'next/link';
 import { SessionProvider } from "next-auth/react";
+import NavBar from "./components/NavBar";
 // import { SessionProvider } from "./provider";
 
 const geistSans = Geist({
@@ -48,26 +50,3 @@ export default function RootLayout({
   );
 }
 
-function NavBar() {
-  return (
-    <nav className="bg-blue-600 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-      <header>
-        <nav>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/stock">Stock</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/user">User</a></li>
-            <li><a href="/contact">Contact</a></li>
-            <li><a href="/signin">SignIn</a></li>
-            {/* Add more links as needed */}
-          </ul>
-        </nav>
-      </header>
-      </div>
-      
-    </nav>
-  )
-
-}

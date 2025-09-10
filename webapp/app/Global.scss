@@ -1,0 +1,15 @@
+$base-font-size: 16px;
+
+$base-color: rgb(245, 116, 27);
+$base-color-light-increment: 80;
+$base-color-light: rgb(
+    calc(red($base-color) - $base-color-light-increment),
+    calc(green($base-color) - $base-color-light-increment),
+    calc(blue($base-color) - $base-color-light-increment)
+);
+
+body {
+    background: $base-color;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+}

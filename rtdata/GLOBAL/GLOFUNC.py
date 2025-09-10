@@ -3,9 +3,7 @@ import os
 from GLOBAL import GLOFUNC
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
-from datetime import datetime
-
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from . import GLOVAR
 
@@ -25,6 +23,18 @@ def utc_to_datetime(timestamp):
     print(f"Converted {timestamp} to {dt}")
     
     return dt
+
+def strdt_to_dt(date_str):
+    naive_datetime = datetime.strptime(date_str[:17], "%Y%m%d %H:%M:%S")
+
+    utc_offset = timedelta(hours=-5)
+
+    eastern_timezone = timezone(utc_offset)
+
+    # Localize the naive datetime to US/Eastern timezone
+    localized_datetime = naive_datetime.replace(tzinfo=eastern_timezone)
+
+    return localized_datetime
 
 def remove_file(file_path):
     try:
@@ -64,12 +74,9 @@ def init_project(list_path_folder):
 init_project(GLOVAR.LIST_PATH_FOLDER)
 
 if __name__ == '__main__':
-    # data = [1,2,'qqq',2,5,'a']
-    # path_output = os.path.join(GLOVAR.PATH_DATA_OUTPUT,'test.csv')
-    # csv_append_row(path_output, data)
+
+
+    date_str = "20250505 15:28:00 US/Eastern"
+    print(strdt_to_dt(date_str))
+
     
-    # print(current_time_ISO8601().split('T')[0])
-    
-    sample = datetime(2025, 8, 21, 16, 14)
-    result = dt_to_timestamp(sample)
-    print(result)

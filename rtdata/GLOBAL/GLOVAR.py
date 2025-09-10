@@ -6,11 +6,13 @@ PATH_DATA = os.path.join(PATH_CURRENT,'data')
 URL_MGDB = 'mongodb://localhost:27017/'
 MGDB_REALTIME_DATA = 'realtime_data'
 MGDB_ACCOUNT_DATA = 'account_data'
+MGDB_MARKET_DATA = 'market_data'
 MGDB_COLL_RT_SEC_5 = 'coll_sec_5'
 MGDB_COLL_RT_AGG_MIN_1 = 'coll_min_1'
 MGDB_COLL_RT_TI = 'coll_ti_min_1'
 MGDB_COLL_ORDERS = 'orders'
 MGDB_COLL_POSITIONS = 'positions'
+MGDB_COLL_SS_MIN_1 = 'stock_prices'
 LIST_SYMBOLS_ORDER_CHECK = ['QQQ']
 
 ISRECREATE_COLL_RT_SEC_5 = False

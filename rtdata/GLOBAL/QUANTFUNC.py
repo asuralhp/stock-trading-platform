@@ -17,6 +17,19 @@ def ohlc_template(symbol, tickerid, timestamp, formattime, endtime, open_, high,
         "count": count
     }
 
+def ohlc_ss_template(symbol, date, open_, high, low, close, volume, wap, barcount):
+    return {
+        "symbol": symbol,
+        "date": date,
+        "open": open_,
+        "high": high,
+        "low": low,
+        "close": close,
+        "volume": int(volume),
+        "wap": float(wap),
+        "barcount": int(barcount)
+    }
+
 # Example usage
 # data = ohlc_template(symbol, time, formattime, open_, high, low, close, volume, wap, count)
 

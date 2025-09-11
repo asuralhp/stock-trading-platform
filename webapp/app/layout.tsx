@@ -6,6 +6,8 @@ import "./Global.scss";
 import Link from 'next/link';
 import { SessionProvider } from "next-auth/react";
 import NavBar from "./components/NavBar";
+
+import { Provider } from "@/components/ui/provider"
 // import { SessionProvider } from "./provider";
 
 const geistSans = Geist({
@@ -29,14 +31,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NavBar></NavBar>
         <main>
-        <SessionProvider>
-        {children}
+        <SessionProvider >
+            <Provider>
+              {children}
+            </Provider>
         </SessionProvider>
           
 

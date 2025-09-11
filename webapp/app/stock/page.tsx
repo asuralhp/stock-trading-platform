@@ -1,10 +1,14 @@
 'use client';
+import './Stock.scss';
 import Link from 'next/link';
 import { WatchList } from '@/app/models/WatchList';
 import { useEffect, useState } from 'react';
 
 import { addToWatchList, removeFromWatchList, updateWatchName, getWatchList as getWatchListApi, addWatch } from '@/app/api/stocks/crud';
 import { getSession } from 'next-auth/react'; // or your auth provider
+
+import {WatchlistSort, SymbolSort, Sorta} from '@/app/components/Sortable';
+import { useSortable } from '@dnd-kit/react/sortable';
 
 export default function Stock() {
     const [userUid, setUserUid] = useState("");
@@ -81,9 +85,13 @@ export default function Stock() {
         setWatchlistResult(res);
         setNewWatchNameInput("");
     };
+    
 
     return (
         <div>
+            
+            <WatchListSection/>
+            
             <h1>Stock Page</h1>
             <h2>Watchlist</h2>
             <ul>
@@ -150,6 +158,22 @@ export default function Stock() {
                 <input value={updateNewWatchName} onChange={e => setUpdateNewWatchName(e.target.value)} placeholder="new watch name" />
                 <button onClick={handleUpdate}>Update</button>
             </div>
+        </div>
+    );
+}
+
+
+const WatchListSection = () => {
+
+
+    return (
+        <div className='stock-container'>
+            
+            <div className='stock-watchlists'>
+                <Sorta  />
+
+            </div>
+
         </div>
     );
 }

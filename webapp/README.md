@@ -14,5 +14,7 @@
 ## Commands
 ```
 npm run devio
-
+npm install @dnd-kit/react
+npm install @dnd-kit/sortable
+npm i @chakra-ui/react @emotion/react
 ```

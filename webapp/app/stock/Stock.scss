@@ -1,0 +1,32 @@
+@import '../Global.scss';
+
+.stock-container {
+    display: flex;
+    align-items: center;
+    background-color: azure;
+    height: 500px;
+    
+}
+
+.stock-watchlists {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: rgb(180, 159, 37);
+    
+    height: 500px;
+    ;
+    
+}
+
+.stock-symbols {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 5;
+    background-color: rgb(110, 39, 95);
+
+    height: 500px;
+    
+    
+}
+

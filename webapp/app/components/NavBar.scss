@@ -1,21 +1,15 @@
 @import '../Global.scss';
 
-.navbar {
-    position: sticky;
-    margin: 0 ;
-    top: 0;
-    background: $base-color;
-    padding: 0 20rem;
 
-}
 
 .navbar-container {
+    position: sticky;
     display: flex;
     align-items: center;
     justify-content: space-between; // Change this to space-between
-    // padding: 0.75rem 0;
-    margin: 0;
-    width: 100%;
+    padding: 0  2rem;
+    // margin:  auto 60px;
+    width: 90vw;
     height: 60px;
 }
 
@@ -31,12 +25,14 @@
 }
 
 .spacer {
-    flex-grow: 1; // This will push the right navbar to the right
+    flex-grow: 0.5; // This will push the right navbar to the right
 }
 
 .navbar-list-right {
     display: flex;
+    flex-grow: 0.5;   
     align-items: center;
+    justify-content: space-between;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -58,7 +54,7 @@
     font-weight: 500;
     font-size: $base-font-size;
     letter-spacing: 0.02em;
-    padding: 0.5rem 1rem;
+    // padding: 0.5rem 1rem;
     transition: background 0.2s, color 0.2s;
 
     &:hover,

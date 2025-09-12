@@ -1,0 +1,37 @@
+$link-color:rgb(255, 255, 255);
+
+.active-watchlist{
+    background-color: azure;
+    border-radius: 10px;
+}
+
+.general-container {
+    display: flex;
+    .symboltab {
+    font: 2em sans-serif;
+    padding: 5px 10px;
+    &:nth-child(1) {
+     flex-grow: 4;
+     max-width: 200px;
+     
+     a {
+        color: $link-color; // Set link color
+        text-decoration: none; // Remove underline
+
+        // Optional: Add hover effect
+        &:hover {
+            text-decoration: none; // Add underline on hover (optional)
+            color: darken($link-color, 10%); // Change color on hover (optional)
+        }
+    }
+
+    }
+    &:nth-child(2) {
+     flex-grow: 1;
+    }
+    &:nth-child(3) {
+     flex-grow: 1;
+    }
+}
+}
+

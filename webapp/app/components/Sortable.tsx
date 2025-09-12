@@ -16,19 +16,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import {SortableItem} from './SortableItem';
+import './Sortable.scss';
+import {SortableItem, SortableItemForSymbol, SymbolTab} from './SortableItem';
 
 
 export function Sorta({}) {
 
     const list_symbol = {
-        "A":['a', 'b', 'c'],
+        "Mag7":['APPL', 'QQQ', 'NVDA'],
         "B":['d', 'e', 'f'],
         "C":['g', 'h', 'i']
     };
 
     const [fullData, SetFullData] = useState(list_symbol);
-    const [activeWatchList, setActiveWatchList] = useState("B");
+    const [activeWatchList, setActiveWatchList] = useState(Object.keys(fullData)[0]);
     const [watchArray, setWatchArray] = useState(Object.keys(fullData))
     const [itemList, setItemList] = useState(fullData[activeWatchList]);
 
@@ -99,8 +100,7 @@ export function Sorta({}) {
         const NewData = fullData
         const newArray = arrayMove(items, oldIndex, newIndex)
         NewData[activeWatchList] = newArray
-        console.log(NewData);
-        
+
         SetFullData(NewData)
         return newArray;
       });
@@ -111,6 +111,12 @@ export function Sorta({}) {
   return (
     <div className='stock-container'>
       <div className='stock-watchlists'>
+          <div className="general-container" >
+            <SymbolTab>
+              Watchlist
+            </SymbolTab>
+            
+          </div>
         <DndContext 
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -121,11 +127,16 @@ export function Sorta({}) {
             items={watchArray}
             strategy={verticalListSortingStrategy}
             >
-            {watchArray.map(id => <SortableItem key={id} id={id} />)}
+            {watchArray.map(id => <SortableItem 
+            key={id} 
+            id={id} 
+            active={activeWatchList===id} 
+            />)}
+
             </SortableContext>
         </DndContext>
       </div>
-      
+      <div className='stock-spacer'></div>
       <div className='stock-symbols'>
           <DndContext 
           sensors={sensors}
@@ -133,11 +144,22 @@ export function Sorta({}) {
           onDragStart={handleDragStartForSymbol}
           onDragEnd={handleDragEndForSymbol}
         >
+          <div className="general-container" >
+            <SymbolTab>
+              Symbol
+            </SymbolTab>
+            <SymbolTab>
+              Price
+            </SymbolTab>
+            <SymbolTab>
+             Change
+            </SymbolTab>
+          </div>
           <SortableContext 
             items={fullData[activeWatchList]}
             strategy={verticalListSortingStrategy}
           >
-            {fullData[activeWatchList].map(id => <SortableItem key={id} id={id} />)}
+            {fullData[activeWatchList].map(id => <SortableItemForSymbol key={id} id={id} />)}
           </SortableContext>
         </DndContext>
       </div>

@@ -167,7 +167,7 @@ const WatchListSection = () => {
 
 
     return (
-        <div className='stock-container'>
+        <div >
             
             <div className='stock-watchlists'>
                 <Sorta  />

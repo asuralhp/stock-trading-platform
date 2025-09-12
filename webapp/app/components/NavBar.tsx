@@ -15,15 +15,16 @@ function NavBar() {
 
         ];
   return (
-    <nav className="navbar">
+
+
+
       <div className="navbar-container">
-        <div>
-            <Image src={Icon} alt="Logo" width={160} />
-        </div>
-        <div className='spacer'></div>
+        <Image src={Icon} alt="Logo" width={100} />
+          <div className='spacer'></div>
+
         <div className="navbar-list">
         {navItems.map(({ href, label }) => (
-            <li className="navbar-item" key={href}>
+          <li className="navbar-item" key={href}>
                 <a href={href} className="navbar-link">{label}</a>
             </li>
         ))}
@@ -31,13 +32,13 @@ function NavBar() {
         <div className='spacer'></div>
         <div className='navbar-list-right'>
         {navItems_right.map(({ href, label }) => (
-            <li className="navbar-item" key={href}>
+          <li className="navbar-item" key={href}>
                 <a href={href} className="navbar-link">{label}</a>
             </li>
         ))}
         </div>
       </div>
-    </nav>
+
   );
 }
 

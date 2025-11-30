@@ -23,7 +23,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
     async redirect({ url, baseUrl }) {
       
-      return baseUrl + '/api/users'; // Redirect to a custom URL after sign in
+      return baseUrl ; // Redirect to a custom URL after sign in
     },
     async session({ session, user, token }) {
       // Attach additional information to the session object

@@ -32,17 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar></NavBar>
-        <main>
-        <SessionProvider >
-
-              {children}
-
+        <SessionProvider>
+          <NavBar />
+          <main>
+            {children}
+          </main>
         </SessionProvider>
-          
-
-          
-        </main>
         <footer>
           <p>© 2025 Stock Trading Platform by Leo Lau</p>
         </footer>

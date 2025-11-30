@@ -166,13 +166,9 @@ export default function Stock() {
 const WatchListSection = () => {
 
 
-    return (
-        <div >
-            
-            <div className='stock-watchlists'>
-                <Sorta  />
-
-            </div>
+    return (  
+        <div className='stock-page'>
+            <Sorta  />
 
         </div>
     );

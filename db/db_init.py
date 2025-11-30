@@ -206,7 +206,7 @@ watchlists = [
 }
               ]
 
-margin_account = {
+margin_accounts = [{
     "userUid": "johndoe",
     "account_balance": 15000.00,
     "margin_limit": 30000.00,
@@ -215,8 +215,17 @@ margin_account = {
     "created_at": "2025-05-25T12:00:00Z",
     "last_updated": "2025-05-25T12:00:00Z",
     "status": "active"
-}
-
+},
+{
+    "userUid": "github_33573968",
+    "account_balance": 20000.00,
+    "margin_limit": 40000.00,
+    "margin_used": 8000.00,
+    "interest_rate": 0.04,
+    "created_at": "2025-05-25T12:00:00Z",
+    "last_updated": "2025-05-25T12:00:00Z",
+    "status": "active"
+}]
 
 
 orders = [
@@ -260,7 +269,7 @@ positions = {
 
 
 user_collection.insert_one(user_info)
-margin_collection.insert_one(margin_account)
+margin_collection.insert_many(margin_accounts)
 orders_collection.insert_many(orders)
 watchlist_collection.insert_many(watchlists)
 positions_collection.insert_one(positions)

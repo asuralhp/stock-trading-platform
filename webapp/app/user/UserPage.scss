@@ -1,0 +1,282 @@
+@import '../Global.scss';
+
+.user-page {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(70, 61, 10, 0);
+  min-height: 100vh;
+}
+
+.user-shell {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: rgba(110, 39, 95, 0);
+}
+
+.user-header__date {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.user-header__status {
+  color: #64748b;
+  margin-top: 4px;
+  font-size: 0.95rem;
+}
+
+.user-header__search {
+  flex: 1;
+}
+
+.user-header__search input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 10px 20px;
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+.user-header__search input:disabled {
+  opacity: 0.8;
+}
+
+.user-header__badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-header__badge img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.user-status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cbd5f5;
+}
+
+.user-status--authenticated {
+  background: #22c55e;
+}
+
+.user-status--loading {
+  background: #facc15;
+}
+
+.user-status--unauthenticated {
+  background: #ef4444;
+}
+
+.user-card {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(70, 61, 10, 0);
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.user-card__hero {
+  display: none;
+}
+
+.user-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-card__profile {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-card__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-card__profile h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.user-card__profile p {
+  margin: 2px 0;
+  color: #64748b;
+}
+
+.user-card__meta {
+  font-size: 0.85rem;
+}
+
+.user-card__edit {
+  margin-left: auto;
+}
+
+.user-hint,
+.user-error {
+  margin: 0;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.user-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-field label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.user-field__value {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.user-email-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.user-email-card__label {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.user-email-card__value {
+  font-weight: 600;
+  margin: 0;
+}
+
+.user-email-card__meta {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.user-email-card__action {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.user-account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: rgba(110, 39, 95, 0);
+}
+
+.user-account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.user-account-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5a5a5a;
+}
+
+.user-status-pill {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.user-status-pill--active {
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.user-status-pill--pending {
+  border-color: #facc15;
+  color: #854d0e;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.account-field label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.account-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.account-meta__label {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.account-meta__value {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .user-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-header__search {
+    width: 100%;
+  }
+
+  .user-email-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

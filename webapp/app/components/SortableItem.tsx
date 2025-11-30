@@ -41,9 +41,9 @@ export function SortableItemForSymbol(props) {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-
-
+  const change_dir = props.change >= 0 ? '+' : '-'
+  const change_rate = (((props.price - props.change)/props.price)*100).toFixed(2);
+  
   return (
     <div className="general-container" ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <SymbolTab>
@@ -53,10 +53,10 @@ export function SortableItemForSymbol(props) {
 
       </SymbolTab>
       <SymbolTab>
-        {150}
+        {props.price}
       </SymbolTab>
       <SymbolTab>
-        +1.00%
+        {change_dir}{props.change} ({change_dir}{change_rate}%)
       </SymbolTab>
     </div>
   );

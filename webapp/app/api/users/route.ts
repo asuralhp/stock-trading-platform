@@ -1,50 +1,60 @@
 'use server';
 import { NextResponse } from 'next/server';
 import { connect_collection } from '@/app/lib/dbconnect';
-import { auth } from "@/auth";
-import {USER_STATUS, MODEL_User, MONGODB_DATABASE_ACCOUNT_DATA, MONGODB_COLLECTION_USER} from '@/GLOVAR';
+import { auth } from '@/auth';
+import omit from 'lodash/omit';
+import {
+  USER_STATUS,
+  MODEL_User,
+  MONGODB_DATABASE_ACCOUNT_DATA,
+  MONGODB_COLLECTION_USER,
+} from '@/GLOVAR';
 
-
-export async function GET(req: Request) {
+export async function GET() {
   const session = await auth();
-  const collection_user = await connect_collection(MONGODB_DATABASE_ACCOUNT_DATA, MONGODB_COLLECTION_USER);
-  const { user } = session || {};
-  
-  const userUid = user?.userUid;
-  const userName = user?.name;
-  const useravatar = user?.image;
-  const userEmail = user?.email;
-  const userFound = await collection_user.findOne({ userUid: userUid });
-  console.log(session);
-  console.log(" userUid is ",userUid);
-  
-  if(userFound === null) {
-    console.log(`Creating new user ${userUid}`);
 
-    await collection_user.insertOne(
-      new MODEL_User(
-        userUid,        
-        userName,       
-        userEmail,
-        "test123456",   
-        useravatar,
-        null,           
-        null,           
-        null,           
-        null,
-        null,                      
-        new Date(),     
-        new Date(),
-        USER_STATUS.ACTIVE,   
-      )
+  if (!session?.user?.userUid) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const collection_user = await connect_collection(
+    MONGODB_DATABASE_ACCOUNT_DATA,
+    MONGODB_COLLECTION_USER
+  );
+
+  const { user } = session;
+  const userUid = user.userUid;
+  const userName = user.name ?? 'New User';
+  const useravatar = user.image ?? null;
+  const userEmail = user.email ?? '';
+
+  let userFound = await collection_user.findOne({ userUid });
+
+  if (!userFound) {
+    console.log(`Creating new user ${userUid}`);
+    const now = new Date().toISOString();
+    const newUser = new MODEL_User(
+      userUid,
+      userName,
+      userEmail,
+      'test123456',
+      useravatar,
+      null,
+      null,
+      null,
+      null,
+      null,
+      now,
+      now,
+      USER_STATUS.ACTIVE
     );
+    await collection_user.insertOne(newUser);
+    userFound = { ...newUser } as Record<string, any>;
   }
-  else {
-    console.log(`User ${userUid} already exists`);
-  }
-      
-  // Redirect to baseURL
-  return NextResponse.redirect(new URL('/', req.url));
+
+  const sanitized = omit(userFound, ['_id']);
+
+  return NextResponse.json({ user: sanitized });
 }
 
 

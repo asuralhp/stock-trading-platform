@@ -1,41 +1,46 @@
 @import '../Global.scss';
 
-
+.navbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: $base-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+}
 
 .navbar-container {
-    position: sticky;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: space-between; // Change this to space-between
-    padding: 0  2rem;
-    // margin:  auto 60px;
-    width: 90vw;
+    padding: 0 2rem;
     height: 60px;
 }
 
 
 .navbar-list {
     display: flex;
-    flex-grow: 1; // Allows it to take up available space on the left
     align-items: center;
-    justify-content: space-between;
+    gap: 1.5rem;
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
 .spacer {
-    flex-grow: 0.5; // This will push the right navbar to the right
+    flex: 1 1 auto;
 }
 
 .navbar-list-right {
     display: flex;
-    flex-grow: 0.5;   
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 1rem;
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 0 auto;
 }
 
 .navbar-item {
@@ -63,4 +68,11 @@
         outline: none;
         border-bottom: 2px solid $base-color-light;
     }
+}
+
+.navbar-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }

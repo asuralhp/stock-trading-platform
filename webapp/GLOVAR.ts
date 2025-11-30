@@ -3,6 +3,7 @@ export const MONGODB_DATABASE_MARKET_DATA = 'market_data';
 
 
 export const MONGODB_COLLECTION_USER = 'user';
+export const MONGODB_COLLECTION_ACCOUNT = 'accounts';
 export const MONGODB_COLLECTION_ORDER = 'orders';
 export const MONGODB_COLLECTION_STOCK_PRICES = 'stock_prices';
 

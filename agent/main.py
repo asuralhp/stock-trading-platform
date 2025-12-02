@@ -32,9 +32,9 @@ async def websocket_endpoint(websocket: WebSocket, mode: str, userUid: Optional[
             
             if mode == GLOVAR.CHAT_TYPE_AGENT:
                 # Placeholder for agent logic
-                data = action_run(data)
-                print(f"Received in AGENT mode: done {data} ")
-                await websocket.send_text(f"AGENT AI: done {data} for {userUid}")
+                data = action_run(data, userUid)
+                print(f"Received in AGENT mode: {data} ")
+                await websocket.send_text(f"AGENT AI: {data} for {userUid}")
             elif mode == GLOVAR.CHAT_TYPE_ASK:
                 # Placeholder for ask logic
                 context = call_rag(data).text

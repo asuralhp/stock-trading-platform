@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRealtimeData } from '../hooks/useRealtimeData';
 import './UserPage.scss';
 
 type ExtendedUser = {
@@ -122,65 +123,69 @@ const UserPage = () => {
   const [accountError, setAccountError] = useState<string | null>(null);
   const [accountLoading, setAccountLoading] = useState(false);
 
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      setDbLoading(true);
+      const res = await fetch('/api/users', { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch user profile: ${res.status}`);
+      }
+      const data = await res.json();
+      setDbUser(data.user);
+      setDbError(null);
+    } catch (error) {
+      console.error(error);
+      setDbError('Unable to load profile data.');
+    } finally {
+      setDbLoading(false);
+    }
+  }, []);
+
+  const fetchAccountData = useCallback(async () => {
+    try {
+      setAccountLoading(true);
+      const res = await fetch('/api/account', { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch account data: ${res.status}`);
+      }
+      const data = await res.json();
+      setAccountData(data.account);
+      setAccountError(null);
+    } catch (error) {
+      console.error(error);
+      setAccountError('Unable to load account data.');
+    } finally {
+      setAccountLoading(false);
+    }
+  }, []);
+
+  // Subscribe to real-time updates
+  useRealtimeData({
+    subscribeTypes: ['user', 'account'],
+    onUpdate: (event) => {
+      console.log('[UserPage] Real-time update:', event);
+      if (event.type === 'user') {
+        if (event.data && event.action === 'update') {
+          setDbUser((prev) => (prev ? { ...prev, ...(event.data as Partial<DbUser>) } : prev));
+        } else {
+          fetchUserProfile();
+        }
+      } else if (event.type === 'account') {
+        if (event.data && event.action === 'update') {
+          setAccountData((prev) => (prev ? { ...prev, ...(event.data as Partial<AccountDataType>) } : prev));
+        } else {
+          fetchAccountData();
+        }
+      }
+    },
+  });
+
   useEffect(() => {
     if (status !== 'authenticated') return;
-    let active = true;
-
-    const fetchUserProfile = async () => {
-      try {
-        setDbLoading(true);
-        const res = await fetch('/api/users', { cache: 'no-store' });
-        if (!res.ok) {
-          throw new Error(`Failed to fetch user profile: ${res.status}`);
-        }
-        const data = await res.json();
-        if (active) {
-          setDbUser(data.user);
-          setDbError(null);
-        }
-      } catch (error) {
-        console.error(error);
-        if (active) {
-          setDbError('Unable to load profile data.');
-        }
-      } finally {
-        if (active) {
-          setDbLoading(false);
-        }
-      }
-    };
-
-    const fetchAccountData = async () => {
-      try {
-        setAccountLoading(true);
-        const res = await fetch('/api/account', { cache: 'no-store' });
-        if (!res.ok) {
-          throw new Error(`Failed to fetch account data: ${res.status}`);
-        }
-        const data = await res.json();
-        if (active) {
-          setAccountData(data.account);
-          setAccountError(null);
-        }
-      } catch (error) {
-        console.error(error);
-        if (active) {
-          setAccountError('Unable to load account data.');
-        }
-      } finally {
-        if (active) {
-          setAccountLoading(false);
-        }
-      }
-    };
-
+    
     fetchUserProfile();
     fetchAccountData();
-
-    return () => {
-      active = false;
-    };
-  }, [status]);
+  }, [status, fetchUserProfile, fetchAccountData]);
 
   const sessionProfile = useMemo(() => {
     const extended = session?.user as ExtendedUser | undefined;

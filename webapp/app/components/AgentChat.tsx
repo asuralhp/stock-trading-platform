@@ -1,6 +1,8 @@
 'use client';
 
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { dataEventBus } from '../lib/dataEventBus';
 
 type ChatMessage = {
   id: string;
@@ -13,6 +15,7 @@ type ConnectionState = 'idle' | 'connecting' | 'ready' | 'error';
 type ChatMode = 'ask' | 'agent';
 
 const AgentChat = () => {
+  const { data: session } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<ChatMode>('ask');
@@ -22,6 +25,8 @@ const AgentChat = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const userUid = (session?.user as { userUid?: string } | undefined)?.userUid ?? '';
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -30,8 +35,9 @@ const AgentChat = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const host = window.location.hostname || 'localhost';
     const endpoint = mode === 'ask' ? '/ws/ask' : '/ws/agent';
-    return `${protocol}://${host}:3003${endpoint}`;
-  }, [mode]);
+    const params = userUid ? `?userUid=${encodeURIComponent(userUid)}` : '';
+    return `${protocol}://${host}:3003${endpoint}${params}`;
+  }, [mode, userUid]);
 
   useEffect(() => {
     // Clear any pending reconnect
@@ -80,12 +86,54 @@ const AgentChat = () => {
       };
       ws.onmessage = (event) => {
         console.log('WebSocket message received:', event.data);
+        
+        let displayText = event.data;
+        
+        // Try to parse as JSON first
+        try {
+          const parsed = JSON.parse(event.data);
+          
+          // Check for explicit data update event
+          if (parsed.__dataUpdate) {
+            const updateEvent = {
+              type: parsed.__dataUpdate.type,
+              action: parsed.__dataUpdate.action,
+              data: parsed.__dataUpdate.data,
+              id: parsed.__dataUpdate.id,
+              timestamp: Date.now(),
+            };
+            console.log('[AgentChat] Dispatching data update:', updateEvent);
+            dataEventBus.dispatch(updateEvent);
+            
+            displayText = parsed.message ?? `Updated ${parsed.__dataUpdate.type}`;
+          } else if (parsed.message) {
+            displayText = parsed.message;
+          }
+        } catch {
+          // Not JSON, check for keywords in text to trigger updates
+          const lowerText = event.data.toLowerCase();
+          
+          if (lowerText.includes('updated') || lowerText.includes('changed') || lowerText.includes('modified')) {
+            if (lowerText.includes('profile') || lowerText.includes('user')) {
+              dataEventBus.dispatch({ type: 'user', action: 'update', timestamp: Date.now() });
+            }
+            if (lowerText.includes('account') || lowerText.includes('balance') || lowerText.includes('fund')) {
+              dataEventBus.dispatch({ type: 'account', action: 'update', timestamp: Date.now() });
+            }
+          }
+          
+          if (lowerText.includes('bought') || lowerText.includes('sold') || lowerText.includes('order')) {
+             dataEventBus.dispatch({ type: 'account', action: 'update', timestamp: Date.now() });
+             // Also trigger stock update if we had a stock page listening
+          }
+        }
+
         setMessages((prev) => [
           ...prev,
           {
             id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
             role: 'agent',
-            text: event.data,
+            text: displayText,
           },
         ]);
       };

@@ -4,3 +4,4 @@ python-dotenv
 websockets
 requests
 google-genai
+pymongo

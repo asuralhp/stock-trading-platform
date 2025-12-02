@@ -8,13 +8,13 @@ from .ag_account import action_account
 
 
 
-def action_route(message):
+def action_route(message, userUid):
     ag_code = resolve(message)['code']
 
     if ag_code == GLOVAR.AG_ACCOUNT:
-        return action_account(message)
+        return action_account(message, userUid)
     elif ag_code == GLOVAR.AG_ORDER:
-        return action_order(message)
+        return action_order(message, userUid)
 
     return {"code":"error", "message":ag_code['message']}
 
@@ -23,10 +23,10 @@ def execute(form):
         print(f"{form['code'], form['parameters']}")
 
 
-def action_run(message):
+def action_run(message, userUid):
 
 
-    form = action_route(message)
+    form = action_route(message, userUid)
     print(form)
     prompt = f"""
         Refine the input text to natural response

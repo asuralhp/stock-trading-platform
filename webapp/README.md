@@ -18,4 +18,5 @@ npm install @dnd-kit/react
 npm install @dnd-kit/sortable
 npm i @chakra-ui/react @emotion/react
 npm install tailwindcss @tailwindcss/postcss postcss
+npm install three @types/three
 ```

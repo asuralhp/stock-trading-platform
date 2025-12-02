@@ -14,7 +14,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"Here is Chroma RAG!")
         
-        elif parsed_path.path == '/retrive':
+        elif parsed_path.path == '/retrieve':
             question = query_params.get('question', ['Give me guides'])[0]
             self.send_response(200)
             self.send_header("Content-type", "text/html")

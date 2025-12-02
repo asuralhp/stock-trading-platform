@@ -6,6 +6,7 @@ export const MONGODB_COLLECTION_USER = 'user';
 export const MONGODB_COLLECTION_ACCOUNT = 'accounts';
 export const MONGODB_COLLECTION_ORDER = 'orders';
 export const MONGODB_COLLECTION_STOCK_PRICES = 'stock_prices';
+export const MONGODB_COLLECTION_MARKET_INDICE = 'market_indice';
 
 export enum USER_STATUS {
   ACTIVE = 'active',

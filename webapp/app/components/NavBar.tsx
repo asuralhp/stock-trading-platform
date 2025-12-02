@@ -18,7 +18,7 @@ function NavBar() {
             { href: '/stock', label: 'Stock' },
             { href: '/about', label: 'About' },
             { href: '/user', label: 'User' },
-            { href: '/contact', label: 'Contact' },
+            { href: '/api/guide', label: 'Guide' },
         ];
     const navItems_right: NavAction[] = status === 'authenticated'
       ? [

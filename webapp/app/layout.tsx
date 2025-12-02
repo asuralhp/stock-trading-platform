@@ -6,6 +6,7 @@ import "./Global.scss";
 import Link from 'next/link';
 import { SessionProvider } from "next-auth/react";
 import NavBar from "./components/NavBar";
+import AgentChat from "./components/AgentChat";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
           <main>
             {children}
           </main>
+          <AgentChat />
         </SessionProvider>
         <footer>
           <p>© 2025 Stock Trading Platform by Leo Lau</p>

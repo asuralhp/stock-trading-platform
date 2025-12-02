@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Low Poly Earth - High Detail</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000000; 
+            /* Subtle starfield or dark background */
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            pointer-events: none;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Tooltip Style */
+        #tooltip {
+            position: absolute;
+            display: none;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            font-size: 0.9rem;
+            backdrop-filter: blur(4px);
+            transform: translate(-50%, -150%);
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info">Drag to Rotate &bull; Hover for Cities</div>
+    <div id="tooltip">City Name</div>
+    <div id="canvas-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Configuration
+        const config = {
+            radius: 2,
+            detail: 4, // Higher polygon count
+            rotationSpeed: 0.002
+        };
+
+        // --- 1. Texture Generation (Real-world based coords) ---
+        function createWorldMapTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048; // Higher res texture
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 1. Ocean Base
+            ctx.fillStyle = '#1a5c99';
+            ctx.fillRect(0, 0, w, h);
+
+            // 2. Continents
+            ctx.fillStyle = '#4caf50';
+
+            // Helper: Convert Lat/Lon to Canvas X/Y
+            // Lon: -180 to 180 -> X: 0 to w
+            // Lat: 90 to -90 -> Y: 0 to h
+            function mapPoint(lat, lon) {
+                const x = ((lon + 180) / 360) * w;
+                const y = ((90 - lat) / 180) * h;
+                return [x, y];
+            }
+
+            function drawPolyFromLatLon(coords) {
+                ctx.beginPath();
+                const start = mapPoint(coords[0][0], coords[0][1]);
+                ctx.moveTo(start[0], start[1]);
+                
+                for (let i = 1; i < coords.length; i++) {
+                    const p = mapPoint(coords[i][0], coords[i][1]);
+                    ctx.lineTo(p[0], p[1]);
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // --- Define Continents by rough Lat/Lon points ---
+            
+            // North America
+            drawPolyFromLatLon([
+                [70, -165], [70, -60], [55, -55], [45, -50], // Canada/Newfoundland
+                [30, -80], [25, -80], // Florida
+                [10, -75], [10, -85], // Panama
+                [20, -105], [30, -120], [50, -130], [60, -160] // West Coast
+            ]);
+            
+            // Greenland
+            drawPolyFromLatLon([
+                [83, -40], [83, -20], [60, -40], [60, -50]
+            ]);
+
+            // South America
+            drawPolyFromLatLon([
+                [12, -75], [10, -60], [-5, -35], // Brazil coast
+                [-20, -40], [-55, -65], // Southern tip
+                [-40, -75], [-10, -80] // West coast
+            ]);
+
+            // Europe
+            drawPolyFromLatLon([
+                [70, 25], [70, 40], // Scandinavia top
+                [60, 40], [55, 20], // Eastern Europe border
+                [40, 25], [35, 10], // Mediterranean
+                [36, -10], // Portugal
+                [45, -5], [55, -10], [60, 5], [70, 10] // Atlantic coast / UK area
+            ]);
+            // UK explicitly to ensure London is covered
+            drawPolyFromLatLon([
+                [58, -6], [58, 2], [50, 2], [50, -6]
+            ]);
+
+            // Asia
+            drawPolyFromLatLon([
+                [75, 40], [75, 180], // Siberia top
+                [30, 120], [20, 120], [15, 110], // China/Vietnam coast (HK is 22, 114)
+                [10, 105], [5, 100], [20, 80], // SE Asia / India
+                [25, 60], [15, 45], [30, 35], [40, 40] // Middle East
+            ]);
+            // Japan
+            drawPolyFromLatLon([ [45, 140], [30, 130], [30, 145] ]);
+
+            // Africa
+            drawPolyFromLatLon([
+                [36, -5], [32, 30], // North coast
+                [10, 50], [-10, 40], [-35, 20], // East coast to South
+                [-30, 10], [5, 0], [10, -15], [30, -10] // West coast
+            ]);
+
+            // Australia
+            drawPolyFromLatLon([
+                [-10, 110], [-10, 150], [-40, 150], [-35, 110]
+            ]);
+
+            // Antarctica
+            ctx.fillStyle = '#ddeeff';
+            drawPolyFromLatLon([
+                [-70, -180], [-70, 180], [-90, 180], [-90, -180]
+            ]);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // --- 2. Scene Setup ---
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 5.5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // --- 3. Earth Mesh ---
+        const geometry = new THREE.IcosahedronGeometry(config.radius, config.detail);
+        const material = new THREE.MeshPhongMaterial({
+            map: createWorldMapTexture(),
+            flatShading: true,
+            shininess: 0,
+            reflectivity: 0
+        });
+        const earth = new THREE.Mesh(geometry, material);
+        
+        // Align rotation:
+        // Three.js Lat/Lon to Vector math puts 0 Lon at +X (if we look from top).
+        // By rotating Y by -90 deg, 0 Lon faces the default camera (+Z).
+        earth.rotation.y = -Math.PI / 2;
+
+        scene.add(earth);
+
+        // --- 4. City Markers (Real World Coordinates) ---
+        const cityMarkers = [];
+        
+        function latLonToVector3(lat, lon, radius) {
+            // Phi: 0 (North Pole) to PI (South Pole)
+            const phi = (90 - lat) * (Math.PI / 180);
+            // Theta: 0 to 2PI. 
+            // Note: In our specific coordinate system derived from the Math below:
+            // lon + 180 means -180 becomes 0, 0 becomes PI, 180 becomes 2PI.
+            const theta = (lon + 180) * (Math.PI / 180);
+
+            // Standard spherical conversion
+            // These match the UV mapping logic used in the texture generation
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const z = (radius * Math.sin(phi) * Math.sin(theta));
+            const y = (radius * Math.cos(phi));
+
+            return new THREE.Vector3(x, y, z);
+        }
+
+        const cities = [
+            { name: "New York", lat: 40.7128, lon: -74.0060 },
+            { name: "London",   lat: 51.5074, lon: -0.1278 },
+            { name: "Hong Kong",lat: 22.3193, lon: 114.1694 },
+            { name: "Sydney",   lat: -33.8688, lon: 151.2093 },
+            { name: "Cape Town",lat: -33.9249, lon: 18.4241 }
+        ];
+
+        const markerGeometry = new THREE.IcosahedronGeometry(0.06, 0); 
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff3333 });
+
+        cities.forEach(city => {
+            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+            
+            const pos = latLonToVector3(city.lat, city.lon, config.radius + 0.05);
+            marker.position.copy(pos);
+            marker.lookAt(new THREE.Vector3(0,0,0)); 
+            marker.userData = { isCity: true, name: city.name };
+            
+            earth.add(marker);
+            cityMarkers.push(marker);
+        });
+
+        // --- 5. Lighting ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); 
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(10, 10, 10);
+        scene.add(mainLight);
+        
+        // Backlight for better contrast
+        const backLight = new THREE.SpotLight(0x00aaff, 1);
+        backLight.position.set(-10, 10, -10);
+        backLight.lookAt(0,0,0);
+        scene.add(backLight);
+
+        // --- 6. Interaction ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const tooltip = document.getElementById('tooltip');
+
+        let isDragging = false;
+        let userHasInteracted = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let rotationVelocity = { x: 0.002, y: 0.002 }; 
+
+        const onMouseDown = (e) => {
+            isDragging = true;
+            userHasInteracted = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        };
+
+        const onMouseMove = (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+                rotationVelocity.x = deltaMove.y * 0.005;
+                rotationVelocity.y = deltaMove.x * 0.005;
+                
+                // Rotate Mesh on World Axis to avoid gimbal lock
+                earth.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotationVelocity.y);
+                earth.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotationVelocity.x);
+                
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            } 
+            
+            if (!isDragging) {
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(earth.children);
+
+                let foundCity = false;
+                if (intersects.length > 0) {
+                    const object = intersects[0].object;
+                    if (object.userData.isCity) {
+                        foundCity = true;
+                        tooltip.style.display = 'block';
+                        tooltip.style.left = e.clientX + 'px';
+                        tooltip.style.top = e.clientY + 'px';
+                        tooltip.textContent = object.userData.name;
+                        object.scale.set(1.5, 1.5, 1.5);
+                        document.body.style.cursor = 'pointer';
+                    }
+                }
+
+                if (!foundCity) {
+                    tooltip.style.display = 'none';
+                    document.body.style.cursor = 'default';
+                    cityMarkers.forEach(m => m.scale.set(1, 1, 1));
+                }
+            }
+        };
+
+        const onMouseUp = () => { isDragging = false; };
+
+        const onTouchStart = (e) => {
+            isDragging = true;
+            userHasInteracted = true;
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        };
+        const onTouchMove = (e) => {
+            if(isDragging) {
+                const deltaMove = {
+                    x: e.touches[0].clientX - previousMousePosition.x,
+                    y: e.touches[0].clientY - previousMousePosition.y
+                };
+                rotationVelocity.x = deltaMove.y * 0.005;
+                rotationVelocity.y = deltaMove.x * 0.005;
+                
+                earth.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotationVelocity.y);
+                earth.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotationVelocity.x);
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        }
+        const onTouchEnd = () => { isDragging = false; };
+
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('touchstart', onTouchStart, {passive: false});
+        window.addEventListener('touchmove', onTouchMove, {passive: false});
+        window.addEventListener('touchend', onTouchEnd);
+
+        // --- 7. Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!userHasInteracted && !isDragging) {
+                earth.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), config.rotationSpeed);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

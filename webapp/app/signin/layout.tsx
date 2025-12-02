@@ -4,7 +4,7 @@ import React from 'react';
 const SettingsLayout = ({ children }) => {
   return (
     <div>
-      <h2>Layout Header</h2>
+      <h2>Sign In With</h2>
       <main>{children}</main>
     </div>
   );

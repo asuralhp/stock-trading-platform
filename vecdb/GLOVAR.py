@@ -1,5 +1,5 @@
 IS_PERSISTENT = True
-PORT_SERVER = 8181
+PORT_SERVER = 3004
 NAME_COLLECTION = "collection_documents"
 PATH_CHROMADB = "./chromadb"
 PATH_DOCUMENTS = "../docapp/content/"

@@ -1,26 +1,24 @@
 import GLOVAR
 
 import os
-from google import genai
+
 from pydantic import BaseModel, Field
 from typing import Literal
 
 # Define the data model for the response
 class ActionParameters(BaseModel):
-    symbol: str = Field(description="the symbol of a listed stock")
-    amount: int = Field(description="The amount or identifier, e.g., 'AAPL'")
-    price: float = Field(description="The price value")
+    cash: int = Field(description="The cash of money to deposit or withdraw")
 
 class AgentAction(BaseModel):
-    code: Literal["buy", "sell", "error"] = Field(description="The action code")
+    code: Literal["deposit", "withdrawal", "error"] = Field(description="The action code")
     parameters: ActionParameters
 
 # Configure the API key
-api_key = os.environ.get("GEMINI_API_KEY")
-ai_model = "gemini-2.5-pro"
-def order(user_input: str):
+
+
+def action_account(user_input: str):
     try:
-        client = genai.Client(api_key=api_key)
+
 
         prompt = f"""
         Analyze the input text 
@@ -28,18 +26,18 @@ def order(user_input: str):
         If matched, decide which action to route to.
 
         Error:
-        - Not Sure -> code: error
+        - Not Sure -> code: error,
 
         Actions:
-        - Buy Stock -> code: buy, parameters: symbol, amount, price
-        - Sell Stock -> code: sell, parameters: symbol amount, price
-        
+                - Deposit -> code: deposit, parameters: cash
+                - Withdrawal -> code: withdrawal, parameters: cash
+
 
         Input: {user_input}
         """
 
-        response = client.models.generate_content(
-            model=ai_model,
+        response = GLOVAR.AI_CLIENT.models.generate_content(
+            model=GLOVAR.AI_MODEL,
             contents=prompt,
             config={
                 'response_mime_type': 'application/json',
@@ -58,7 +56,6 @@ def order(user_input: str):
 
 if __name__ == "__main__":
 
-    order("I want to buy 90 AAPL at 100 dollars")
-    # order("Sell 20 MSFT at $200")
-    # order("Blah blah blah")
+    action_account("I want to deposit 1000 dollars")
+    action_account("I want to withdraw 500 dollars")
     pass

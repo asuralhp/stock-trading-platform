@@ -1,9 +1,10 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 import uvicorn
 import GLOVAR
 from call.callrag import call_rag
-from call.order_agent import order
+from call.executor import action_run
 
 app = FastAPI()
 
@@ -23,7 +24,7 @@ async def root():
 
 
 @app.websocket("/ws/{mode}")
-async def websocket_endpoint(websocket: WebSocket, mode: str):
+async def websocket_endpoint(websocket: WebSocket, mode: str, userUid: Optional[str] = None):
     await websocket.accept()
     try:
         while True:
@@ -31,9 +32,9 @@ async def websocket_endpoint(websocket: WebSocket, mode: str):
             
             if mode == GLOVAR.CHAT_TYPE_AGENT:
                 # Placeholder for agent logic
-                data = order(data)
+                data = action_run(data)
                 print(f"Received in AGENT mode: done {data} ")
-                await websocket.send_text(f"AGENT AI: done {data}")
+                await websocket.send_text(f"AGENT AI: done {data} for {userUid}")
             elif mode == GLOVAR.CHAT_TYPE_ASK:
                 # Placeholder for ask logic
                 context = call_rag(data).text

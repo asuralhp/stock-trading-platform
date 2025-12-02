@@ -1,12 +1,16 @@
+import GLOVAR
+
 import asyncio
 import websockets
 
-async def test_chat():
-    uri = "ws://localhost:3003/ws/chat"
+async def test_ask(message, chat_type):
+
+
+    uri = f"ws://localhost:{GLOVAR.PORT_SERVER}/ws/{chat_type}"
     print(f"Connecting to {uri}...")
     try:
         async with websockets.connect(uri) as websocket:
-            message = "Hello from test script!"
+
             print(f"> Sending: {message}")
             await websocket.send(message)
             
@@ -19,4 +23,4 @@ async def test_chat():
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(test_chat())
+    asyncio.run(test_ask("Buy 100 Nvidia stock at $189.99  ",GLOVAR.CHAT_TYPE_AGENT))

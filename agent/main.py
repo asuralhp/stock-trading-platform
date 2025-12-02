@@ -2,7 +2,9 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import GLOVAR
-from callrag import call_rag
+from call.callrag import call_rag
+from call.order_agent import order
+
 app = FastAPI()
 
 # Configure CORS to allow requests from the Next.js frontend
@@ -27,11 +29,12 @@ async def websocket_endpoint(websocket: WebSocket, mode: str):
         while True:
             data = await websocket.receive_text()
             
-            if mode == "agent":
+            if mode == GLOVAR.CHAT_TYPE_AGENT:
                 # Placeholder for agent logic
-                print(f"Received in AGENT mode: {data}")
-                await websocket.send_text(f"AGENT AI: {data}")
-            elif mode == "ask":
+                data = order(data)
+                print(f"Received in AGENT mode: done {data} ")
+                await websocket.send_text(f"AGENT AI: done {data}")
+            elif mode == GLOVAR.CHAT_TYPE_ASK:
                 # Placeholder for ask logic
                 context = call_rag(data).text
                 print(f"Received in ASK mode: {data}")

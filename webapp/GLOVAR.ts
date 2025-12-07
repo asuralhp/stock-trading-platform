@@ -1,3 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
+export const ALPACA_API_KEY = process.env.ALPACA_API_KEY;
+export const ALPACA_API_SECRET = process.env.ALPACA_API_SECRET;
+
 export const MONGODB_DATABASE_ACCOUNT_DATA = 'account_data';
 export const MONGODB_DATABASE_MARKET_DATA = 'market_data';
 
@@ -7,6 +13,8 @@ export const MONGODB_COLLECTION_ACCOUNT = 'accounts';
 export const MONGODB_COLLECTION_ORDER = 'orders';
 export const MONGODB_COLLECTION_STOCK_PRICES = 'stock_prices';
 export const MONGODB_COLLECTION_MARKET_INDICE = 'market_indice';
+
+
 
 export enum USER_STATUS {
   ACTIVE = 'active',

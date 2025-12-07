@@ -5,11 +5,13 @@ import { useEffect, useState, use } from 'react';
 import { getOrders } from '@/app/api/stocks/[symbol]/crud'; // Adjust the import path as needed
 import D3SCGraph from '@/app/components/D3SCGraph';
 import tickerData from "@/app/data/ticker.json"; 
+import RiskIndexCard from '@/app/components/RiskIndexCard';
 
 
 interface StockProps {
     params: Promise<{ symbol: string }>; // <-- params is now a Promise
 }
+const riskIndex = 0.7; // test
 
 export default function Stock(props: StockProps) {
     const { symbol } = use(props.params); // <-- unwrap params with use()
@@ -127,9 +129,9 @@ export default function Stock(props: StockProps) {
 
     return (
         <div>
-            <h1>{symbol} --- Details About Product </h1>
+            <h1><RiskIndexCard symbol={symbol} riskIndex={riskIndex} /> </h1>
             <D3SCGraph symbol={symbol} tickerData={tickerData} />
-            <OrderForm />
+            {/* <OrderForm /> */}
             
             <div style={{ marginTop: '2rem' }}>
                 <h2>Order History</h2>

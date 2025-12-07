@@ -92,6 +92,15 @@ export default function Stock() {
             
             <WatchListSection/>
             
+            
+        </div>
+    );
+}
+
+
+const InputSection = () => {
+    return (
+        <div className='input-section'>
             <h1>Stock Page</h1>
             <h2>Watchlist</h2>
             <ul>
@@ -160,9 +169,7 @@ export default function Stock() {
             </div>
         </div>
     );
-}
-
-
+};
 const WatchListSection = () => {
 
 

@@ -23,7 +23,7 @@ import {SortableItem, SortableItemForSymbol, SymbolTab} from './SortableItem';
 export function Sorta({}) {
 
 const list_symbol = {
-    "Technology": ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'FB', 'QQQ'],
+    "Technology": ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'QQQ'],
     "Healthcare": ['JNJ', 'PFE', 'MRK', 'UNH', 'ABT'],
     "Financials": ['JPM', 'BAC', 'V', 'WFC', 'GS'],
     "Consumer": ['AMZN', 'TSLA', 'NKE', 'DIS', 'HD'],
@@ -237,8 +237,9 @@ const info_symbol = {
 
     const [fullData, SetFullData] = useState(list_symbol);
     const [activeWatchList, setActiveWatchList] = useState(Object.keys(fullData)[0]);
-    const [watchArray, setWatchArray] = useState(Object.keys(fullData))
-    const [itemList, setItemList] = useState(fullData[activeWatchList]);
+    const [watchArray, setWatchArray] = useState(Object.keys(fullData));
+    const [itemList, setItemList] = useState<string[]>(fullData[activeWatchList as keyof typeof fullData]);
+    const currentSymbols = fullData[activeWatchList as keyof typeof fullData] as string[];
 
   // Timer refs
   const dragStartTimeRef = useRef<number | null>(null);
@@ -259,12 +260,12 @@ const info_symbol = {
   };
 
 
-  function handleDragStart(event) {
+  function handleDragStart(event: any) {
     dragStartTimeRef.current = Date.now();
 
   }
   
-  function handleDragEnd(event) {
+  function handleDragEnd(event: any) {
     const {active, over} = event;
     
     
@@ -273,9 +274,9 @@ const info_symbol = {
     if (dragStartTimeRef.current) {
       const interval = (dragEndTime - dragStartTimeRef.current) / 1000;
       if (interval < 0.1 && event.active.id) {
-        console.log("Clicked on:", activeWatchList, list_symbol[event.active.id]);
+        console.log("Clicked on:", activeWatchList, (list_symbol as any)[event.active.id]);
         setActiveWatchList(event.active.id);
-        setItemList(list_symbol[event.active.id]);
+        setItemList((list_symbol as any)[event.active.id]);
       }
     }
     dragStartTimeRef.current = null;
@@ -290,25 +291,25 @@ const info_symbol = {
     }
   }
   
-  function handleDragStartForSymbol(event) {
+  function handleDragStartForSymbol(event: any) {
 
 
   }
   
-  function handleDragEndForSymbol(event) {
+  function handleDragEndForSymbol(event: any) {
     const {active, over} = event;
     
     
     
     if (over && active.id !== over.id) {
-      setItemList((items) => {
+      setItemList((items: string[]) => {
         const oldIndex = items.indexOf(active.id);
         const newIndex = items.indexOf(over.id);
-        const NewData = fullData
-        const newArray = arrayMove(items, oldIndex, newIndex)
-        NewData[activeWatchList] = newArray
+        const NewData = fullData;
+        const newArray: string[] = arrayMove(items, oldIndex, newIndex);
+        (NewData as any)[activeWatchList] = newArray;
 
-        SetFullData(NewData)
+        SetFullData(NewData);
         return newArray;
       });
     }
@@ -334,11 +335,9 @@ const info_symbol = {
             items={watchArray}
             strategy={verticalListSortingStrategy}
             >
-            {watchArray.map(id => <SortableItem 
-            key={id} 
-            id={id} 
-            active={activeWatchList===id} 
-            />)}
+            {watchArray.map((id: string) => (
+              <SortableItem key={id} id={id} active={activeWatchList===id} />
+            ))}
 
             </SortableContext>
         </DndContext>
@@ -363,18 +362,12 @@ const info_symbol = {
             </SymbolTab>
           </div>
           <SortableContext 
-            items={fullData[activeWatchList]}
+            items={currentSymbols}
             strategy={verticalListSortingStrategy}
           >
-            {fullData[activeWatchList].map(
-              id => 
-            <SortableItemForSymbol 
-              key={id} 
-              id={id} 
-              price={info_symbol[id]?.price || 100}
-              change={info_symbol[id]?.change || 1}
-              />
-            )}
+            {currentSymbols.map((id: string) => (
+              <SortableItemForSymbol key={id} id={id} />
+            ))}
           </SortableContext>
         </DndContext>
       </div>

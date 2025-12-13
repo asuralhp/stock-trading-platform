@@ -2,7 +2,7 @@
 import { connect_collection } from '@/app/lib/dbconnect';
 import { Order } from "@/app/models/Order";
 import { auth } from "@/auth";
-import { MONGODB_DATABASE_ACCOUNT_DATA, MONGODB_COLLECTION_ORDER, MONGODB_COLLECTION_STOCK_PRICES, TIME_UNIT, MONGODB_DATABASE_MARKET_DATA} from "@/GLOVAR";
+import { MONGODB_DATABASE_ACCOUNT_DATA, MONGODB_COLLECTION_ORDER, MONGODB_COLLECTION_STOCK_PRICES, TIME_UNIT, MONGODB_DATABASE_MARKET_DATA, ALPACA_API_KEY, ALPACA_API_SECRET } from "@/GLOVAR";
 import { Double } from 'mongodb';
 import { TickerData } from "@/app/models/Ticker";
 
@@ -81,23 +81,107 @@ export async function getOrders(symbol: string) {
 
 
 export async function getStockTicker(symbol: string, timeUnit: TIME_UNIT): Promise<TickerData[]> {
-    
     const collection = await connect_collection(MONGODB_DATABASE_MARKET_DATA, MONGODB_COLLECTION_STOCK_PRICES);
+
+    // Try to get minute OHLC from DB first
     const tickers = await collection.find({ symbol: String(symbol) }).toArray();
-    if (!tickers || tickers.length === 0) {
-        throw new Error(`Ticker not found for symbol: ${symbol}`);
+    if (tickers && tickers.length > 0) {
+        return tickers.map(ticker => ({
+            symbol: ticker.symbol,
+            name: ticker.name,
+            price: typeof ticker.price === 'object' && ticker.price !== null && 'value' in ticker.price
+                ? ticker.price.value
+                : ticker.price,
+            Date: ticker.Date ?? ticker.date ?? null,
+            Open: ticker.Open ?? ticker.open ?? null,
+            Close: ticker.Close ?? ticker.close ?? null,
+            Low: ticker.Low ?? ticker.low ?? null,
+            High: ticker.High ?? ticker.high ?? null,
+        }));
     }
-    // Convert MongoDB objects to TickerData[]
-    return tickers.map(ticker => ({
-        symbol: ticker.symbol,
-        name: ticker.name,
-        price: typeof ticker.price === 'object' && ticker.price !== null && 'value' in ticker.price
-            ? ticker.price.value
-            : ticker.price,
-        Date: ticker.Date ?? ticker.date ?? null,
-        Open: ticker.Open ?? ticker.open ?? null,
-        Close: ticker.Close ?? ticker.close ?? null,
-        Low: ticker.Low ?? ticker.low ?? null,
-        High: ticker.High ?? ticker.high ?? null,
-    }));
+
+    // If DB has no data, fetch previous day's 1-minute bars from Alpaca and insert into DB
+    if (!ALPACA_API_KEY || !ALPACA_API_SECRET) {
+        throw new Error('Alpaca API keys are not configured');
+    }
+
+    try {
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setUTCDate(now.getUTCDate() - 1);
+        const start = new Date(Date.UTC(yesterday.getUTCFullYear(), yesterday.getUTCMonth(), yesterday.getUTCDate(), 0, 0, 0));
+        const end = new Date(Date.UTC(yesterday.getUTCFullYear(), yesterday.getUTCMonth(), yesterday.getUTCDate(), 23, 59, 59));
+
+        const startISO = start.toISOString();
+        const endISO = end.toISOString();
+
+        const url = `https://data.alpaca.markets/v2/stocks/${encodeURIComponent(symbol)}/bars?timeframe=1Min&start=${encodeURIComponent(startISO)}&end=${encodeURIComponent(endISO)}&limit=1000`;
+
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'APCA-API-KEY-ID': ALPACA_API_KEY,
+                'APCA-API-SECRET-KEY': ALPACA_API_SECRET,
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!res.ok) {
+            const body = await res.text();
+            throw new Error(`Alpaca API error ${res.status}: ${body}`);
+        }
+
+        const data = await res.json();
+
+        // Alpaca may return { bars: [...] } or other shapes; normalize to array
+        let bars: any[] = [];
+        if (Array.isArray(data?.bars)) {
+            bars = data.bars;
+        } else if (Array.isArray(data)) {
+            bars = data;
+        } else if (data?.bars && typeof data.bars === 'object') {
+            // try values
+            bars = Object.values(data.bars).filter((v: any) => Array.isArray(v)).flat();
+        }
+
+        if (!bars || bars.length === 0) {
+            throw new Error(`No minute bars returned from Alpaca for ${symbol} on ${startISO}`);
+        }
+
+        // Map to DB documents and insert
+        const docs = bars.map(bar => ({
+            symbol: String(symbol),
+            Date: bar.t ?? bar.time ?? bar.timestamp ?? null,
+            Open: bar.o ?? bar.open ?? null,
+            Close: bar.c ?? bar.close ?? null,
+            Low: bar.l ?? bar.low ?? null,
+            High: bar.h ?? bar.high ?? null,
+            Volume: bar.v ?? bar.volume ?? null,
+            fetched_at: new Date(),
+        }));
+
+        if (docs.length > 0) {
+            try {
+                await collection.insertMany(docs, { ordered: false });
+            } catch (insertErr: any) {
+                // ignore duplicate key errors or partial failures (silent)
+            }
+        }
+
+        return docs.map(d => new TickerData(String(d.Date), Number(d.Open ?? 0), Number(d.Close ?? 0), Number(d.Low ?? 0), Number(d.High ?? 0)));
+
+    } catch (err: any) {
+        throw err;
+    }
+}
+
+export async function getTickerInfo(symbol: string) {
+    const collection = await connect_collection(MONGODB_DATABASE_MARKET_DATA, 'ticker_info');
+    const info = await collection.findOne({ symbol: String(symbol) });
+    if (!info) {
+        return null;
+    }
+    // Convert ObjectId and other BSON types to plain JSON-safe objects if needed
+    // We'll keep the shape as-is and let the client component handle field access safely.
+    return info;
 }

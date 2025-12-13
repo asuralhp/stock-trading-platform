@@ -22,6 +22,7 @@ const AgentChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingMessage, setPendingMessage] = useState('');
   const [connectionState, setConnectionState] = useState<ConnectionState>('idle');
+  const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,6 +77,7 @@ const AgentChat = () => {
       ws.onerror = (err) => {
         console.error('WebSocket error:', err);
         setConnectionState('error');
+        setIsAwaitingResponse(false);
       };
       ws.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason);
@@ -136,6 +138,9 @@ const AgentChat = () => {
             text: displayText,
           },
         ]);
+
+        // Received agent message — clear awaiting flag
+        setIsAwaitingResponse(false);
       };
     }, 100);
 
@@ -169,6 +174,8 @@ const AgentChat = () => {
 
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       socketRef.current.send(trimmed);
+      // mark that we're awaiting an agent response
+      setIsAwaitingResponse(true);
     }
 
     setPendingMessage('');
@@ -190,6 +197,22 @@ const AgentChat = () => {
 
   if (!isMounted) {
     return null;
+  }
+
+  function TypingIndicator({size = 8}:{size?: number}){
+    const [dots, setDots] = useState('');
+    useEffect(()=>{
+      let cancelled = false;
+      let i = 0;
+      const id = setInterval(()=>{
+        if (cancelled) return;
+        i = (i + 1) % 4;
+        setDots('.'.repeat(i));
+      }, 400);
+      return ()=>{ cancelled = true; clearInterval(id); };
+    },[]);
+    const style: CSSProperties = { display: 'inline-block', width: `${size*3}px`, textAlign: 'left', color: 'rgba(255,255,255,0.85)' };
+    return <span style={style}>…{dots}</span>;
   }
 
   return (
@@ -222,6 +245,11 @@ const AgentChat = () => {
                 {message.text}
               </div>
             ))}
+              {isAwaitingResponse && (
+                <div style={{ ...messageBubbleStyle, alignSelf: 'flex-start', backgroundColor: '#111827', opacity: 0.95 }}>
+                  <TypingIndicator />
+                </div>
+              )}
           </div>
           <form onSubmit={handleSubmit} style={formStyle}>
             <button

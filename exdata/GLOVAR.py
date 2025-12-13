@@ -1,0 +1,5 @@
+COUNT_MESSAGE = 250000
+SUB_TOPIC = "tick-AAPL"
+GROUP_ID = "tick-group"
+
+PORT_SERVER = 3009

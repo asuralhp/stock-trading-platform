@@ -1,4 +1,6 @@
 import { handlers } from "@/auth" 
+import { NextResponse } from "next/server";
+
 // Custom GET handler
 export async function GET(req: Request) {
   const url = new URL(req.url);

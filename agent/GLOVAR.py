@@ -10,6 +10,7 @@ CHAT_TYPE_AGENT = 'agent'
 
 AG_ORDER = 'ag_order'
 AG_ACCOUNT = 'ag_account'
+AG_WATCHLIST = 'ag_watchlist'
 
 ACTION_BUY = 'buy'
 ACTION_SELL = 'sell'
@@ -18,7 +19,8 @@ ACTION_WD = 'withdrawal'
 ACTION_DP = 'deposit'
 
 # AI_MODEL = "gemini-2.5-pro"
-AI_MODEL = "gemini-2.5-flash"
+# AI_MODEL = "gemini-2.5-flash"
+AI_MODEL = "gemini-2.5-flash-lite"
 
 with open('.secret/apikey.json', 'r') as json_file:
     loaded_data = json.load(json_file)
@@ -35,6 +37,6 @@ MONGODB_CLIENT = MongoClient(MONGODB_URI)
 # Create or access a database
 MONGODB_DB_ACCOUNT = MONGODB_CLIENT['account_data']  # Database name
 
-
+MONGODB_COLL_WATCHLIST = MONGODB_DB_ACCOUNT['watchlist']
 MONGODB_COLL_ACCOUNT = MONGODB_DB_ACCOUNT['accounts']   
 MONGODB_COLL_ORDER = MONGODB_DB_ACCOUNT['orders']

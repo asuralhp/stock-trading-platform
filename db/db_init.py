@@ -182,24 +182,34 @@ watchlists = [
     "userUid": "github_33573968",  # Reference to user
     "watchlist": [
         {
-            "name": "WatchA",
+            "name": "Technology",
             "stocks": [
                 {"symbol": "AAPL"},
-                {"symbol": "NVDA"}
-            ]
-        },
-        {
-            "name": "WatchB",
-            "stocks": [
-                {"symbol": "TSLA"},
-                {"symbol": "AMZN"}
-            ]
-        },
-        {
-            "name": "WatchC",
-            "stocks": [
+                {"symbol": "MSFT"},
+                {"symbol": "NVDA"},
                 {"symbol": "GOOGL"},
-                {"symbol": "NFLX"}
+                {"symbol": "META"},
+                {"symbol": "QQQ"}
+            ]
+        },
+        {
+            "name": "Healthcare",
+            "stocks": [
+                {"symbol": "JNJ"},
+                {"symbol": "PFE"},
+                {"symbol": "MRK"},
+                {"symbol": "UNH"},
+                {"symbol": "ABT"}
+            ]
+        },
+        {
+            "name": "Financials",
+            "stocks": [
+                {"symbol": "JPM"},
+                {"symbol": "BAC"},
+                {"symbol": "V"},
+                {"symbol": "WFC"},
+                {"symbol": "GS"}
             ]
         }
     ]

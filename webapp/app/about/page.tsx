@@ -41,7 +41,7 @@ export default function Home() {
         console.log('Sent: hello world');
     };
     
-    const sendPosition = (event) => {
+    const sendPosition = (event: any) => {
         console.log('Sending position...');
         socket.emit('position', event);
         console.log('Sent: position', 'event');

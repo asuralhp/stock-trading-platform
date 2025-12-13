@@ -7,7 +7,7 @@ from typing import Literal
 
 # Define the data model for the response
 class ResolveGroup(BaseModel):
-    code: Literal["ag_order", "ag_account"] = Field(description="The action group code")
+    code: Literal["ag_order", "ag_account", "ag_watchlist"] = Field(description="The action group code")
     message: Literal["message"] = Field(description="infomation message")
 # Configure the API key
 
@@ -22,6 +22,7 @@ def resolve(user_input: str):
         Action Groups:
         - Order -> code: ag_order, description: buying or selling stock
         - Account -> code: ag_account, description: deposit or withdrawal account related like principle
+        - Watchlist -> code: ag_watchlist, description: creating or managing stock watchlists
         
         Input: {user_input}
         """

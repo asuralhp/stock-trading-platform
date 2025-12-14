@@ -1,0 +1,6 @@
+bearish
+bullish
+.secrets
+*.pth
+*.json
+*.csv

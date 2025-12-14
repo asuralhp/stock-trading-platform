@@ -1,45 +1,41 @@
 import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
 import GitHubProvider from "next-auth/providers/github";
 
-
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const authOptions = {
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,   // Reference the environment variable
-      clientSecret: process.env.GITHUB_CLIENT_SECRET, // 
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Here you can check the provider and add custom logic
-      // For example, you can log the account information
       console.log('User:', user);
       console.log('Account:', account);
       console.log('Profile:', profile);
-      
-      return user; // Return true to allow sign in
+      return true;
     },
     async redirect({ url, baseUrl }) {
-      
-      return baseUrl ; // Redirect to a custom URL after sign in
+      return baseUrl;
     },
-    async session({ session, user, token }) {
-      // Attach additional information to the session object
-      session.user.provider = token.provider; // Add provider info
-      session.user.userId = token.userId; // Add user ID from the account
-      session.user.userUid = `${token.provider}_${token.userId}`; // Add user ID from the account
-      session.user.sub = token.sub;
+    async session({ session, token }) {
+      if (session?.user && token) {
+        (session.user as any).provider = (token as any).provider;
+        (session.user as any).userId = (token as any).userId;
+        (session.user as any).userUid = `${(token as any).provider}_${(token as any).userId}`;
+        (session.user as any).sub = (token as any).sub;
+      }
       return session;
     },
-    async jwt({token, user, account}) {
-      // Store provider and account ID in the token
+    async jwt({ token, account }) {
       if (account) {
-        token.provider = account.provider;
-        token.userId = account.providerAccountId;
+        (token as any).provider = account.provider;
+        (token as any).userId = account.providerAccountId;
       }
       return token;
-    }
-  }
-})
+    },
+  },
+}
+
+export const { auth, handlers, signIn, signOut } = NextAuth(authOptions as any)

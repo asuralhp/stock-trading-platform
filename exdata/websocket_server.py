@@ -1,8 +1,11 @@
 import asyncio
 import json
+import os
+import uuid
+
 import websockets
 from aiokafka import AIOKafkaConsumer
-import uuid
+
 import GLOVAR
 
 
@@ -31,11 +34,10 @@ async def handler(websocket):
 
         consumer = AIOKafkaConsumer(
             topic,
-            bootstrap_servers='localhost:9092',
+            bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092"),
             group_id=group_id,
-            # start from earliest to deliver any queued ticks to new clients
-            # auto_offset_reset='earliest',
-            auto_offset_reset='latest',
+            # start from earliest to deliver any queued ticks to new clients; switch to 'latest' if you only want live data
+            auto_offset_reset=os.getenv("KAFKA_AUTO_OFFSET_RESET", "earliest"),
             value_deserializer=lambda m: json.loads(m.decode('utf-8'))
         )
         
@@ -58,8 +60,10 @@ async def handler(websocket):
         print("Connection handler finished")
 
 async def main():
-    print(f"Starting WebSocket Server on ws://localhost:{GLOVAR.PORT_SERVER}")
-    async with websockets.serve(handler, "localhost", GLOVAR.PORT_SERVER):
+    host = os.getenv("WS_HOST", "0.0.0.0")
+    port = int(os.getenv("PORT_SERVER", GLOVAR.PORT_SERVER))
+    print(f"Starting WebSocket Server on ws://{host}:{port}")
+    async with websockets.serve(handler, host, port):
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":

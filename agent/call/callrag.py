@@ -1,7 +1,7 @@
 import requests
 import GLOVAR
 
-url = f"http://localhost:{GLOVAR.VECDB_SERVER}/retrieve"
+url = f"http://{GLOVAR.VECDB_HOST}:{GLOVAR.VECDB_SERVER}/retrieve"
 
 
 def call_rag(question):

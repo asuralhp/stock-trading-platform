@@ -2,6 +2,11 @@
 
 This is the Python backend for the Agentic Action and Popup Chat application.
 
+## Docker
+
+docker build -t agent:latest .
+docker run --rm -p 3003:3003 --name agent agent:latest
+
 ## Setup
 
 1.  **Create Virtual Environment:**
@@ -23,13 +28,13 @@ This is the Python backend for the Agentic Action and Popup Chat application.
 The server is configured to run on port **3003**.
 
 ```bash
-python main.py
+python server.py
 ```
 
 Or using uvicorn directly:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 3003 --reload
+uvicorn server:app --host 0.0.0.0 --port 3003 --reload
 ```
 
 ## Endpoints

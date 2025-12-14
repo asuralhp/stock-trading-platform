@@ -4,14 +4,17 @@ Kafka Producer Hello World Example
 Sends messages to a Kafka topic
 """
 
-from kafka import KafkaProducer
 import json
-import time
+import os
 import random
+import time
 from datetime import datetime, timezone
 from pathlib import Path
-import GLOVAR
+
 import yfinance as yf
+from kafka import KafkaProducer
+
+import GLOVAR
 
 
 def generate_ticks(count: int = 25):
@@ -68,7 +71,7 @@ def main():
 
     # Create a Kafka producer
     producer = KafkaProducer(
-        bootstrap_servers=['127.0.0.1:9092'],
+        bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092"),
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
     

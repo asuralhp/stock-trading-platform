@@ -1,10 +1,10 @@
 import getServerSession from "next-auth"
-import { authOptions } from "./auth/[...nextauth]"
+import { authOptions } from "../../auth"
 import { NextApiRequest, NextApiResponse } from "next"; // Importing types
 
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(req as any, res as any, authOptions as any);
 
   if (session) {
     res.send({

@@ -11,13 +11,16 @@ import { DynamicTool } from 'langchain/tools';
 import { createReactAgent, AgentExecutor } from 'langchain/agents';
 // "../../../../vecdb/chromadb"
 
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
-  temperature: 0
-});
+function getModel() {
+  return new ChatGoogleGenerativeAI({
+    model: "gemini-2.0-flash",
+    temperature: 0
+  });
+}
 
 
 export async function llmBot(input: string, context: string): Promise<string> {
+  const model = getModel();
 
 
   const prompt = ChatPromptTemplate.fromMessages([
@@ -71,7 +74,8 @@ export async function ragBot(input: string): Promise<string> {
   return result;
 }
 
-ragBot("How many stationary does Ken have? ");
+// Commented out to prevent execution during build
+// ragBot("How many stationary does Ken have? ");
 
 
 
@@ -106,6 +110,7 @@ Avoid error : OutputParserException [Error]: Could not parse LLM output
 // Observation: action result
 // ... (repeat Thought/Action/Observation N times)
 // Thought: I know what to respond
+  const model = getModel();
   // const prompt = await pull<PromptTemplate>("jet-taekyo-lee/time-aware-react-multi-input-json");
   const prompt = ChatPromptTemplate.fromMessages([
     ["system", systemMessage],

@@ -23,8 +23,9 @@ async def test_ask(message, chat_type, user_uid):
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(test_ask("Buy 100 Nvidia stock at $189.99  ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
-    asyncio.run(test_ask("Sell 10 Tesla stock at $222.99  ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
-    time.sleep(4)
-    asyncio.run(test_ask("Withdrawal $2202.99 out of my account ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
-    asyncio.run(test_ask("Deposit $330.30 to the margin account ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
+    asyncio.run(test_ask("Mary pen?", GLOVAR.CHAT_TYPE_ASK, "user123"))
+    # asyncio.run(test_ask("Buy 100 Nvidia stock at $189.99  ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
+    # asyncio.run(test_ask("Sell 10 Tesla stock at $222.99  ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
+    # time.sleep(4)
+    # asyncio.run(test_ask("Withdrawal $2202.99 out of my account ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))
+    # asyncio.run(test_ask("Deposit $330.30 to the margin account ",GLOVAR.CHAT_TYPE_AGENT, "abc123"))

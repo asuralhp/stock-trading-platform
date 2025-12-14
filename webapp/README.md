@@ -1,3 +1,8 @@
+# WEBAPP
+
+docker-compose up --build -d webapp
+
+
 ## Notes
 
 

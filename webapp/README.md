@@ -1,7 +1,7 @@
 # WEBAPP
 
 docker-compose up --build -d webapp
-
+docker build --no-cache -t webapp-webapp:latest .
 
 ## Notes
 

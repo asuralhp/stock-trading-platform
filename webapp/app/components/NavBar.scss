@@ -1,4 +1,4 @@
-@import '../Global.scss';
+@use '../Global.scss' as *;
 
 .navbar {
     position: sticky;

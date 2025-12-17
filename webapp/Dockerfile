@@ -6,6 +6,9 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json ./
+# Ensure dev dependencies (Tailwind/PostCSS) are installed even if build env sets NODE_ENV=production
+ENV NODE_ENV=development
+ENV NPM_CONFIG_PRODUCTION=false
 RUN npm ci
 
 

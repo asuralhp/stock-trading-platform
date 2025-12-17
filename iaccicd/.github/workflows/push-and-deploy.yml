@@ -1,0 +1,251 @@
+name: CI/CD — Build, Push and Deploy to EKS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'webapp/**'
+      - 'docapp/**'
+      - 'agent/**'
+      - 'vecdb/**'
+      - 'exdata/**'
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    outputs:
+      webapp: ${{ steps.paths.outputs.webapp }}
+      docapp: ${{ steps.paths.outputs.docapp }}
+      agent: ${{ steps.paths.outputs.agent }}
+      vecdb: ${{ steps.paths.outputs.vecdb }}
+      exdata: ${{ steps.paths.outputs.exdata }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed folders
+        id: paths
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            webapp:
+              - 'webapp/**'
+            docapp:
+              - 'docapp/**'
+            agent:
+              - 'agent/**'
+            vecdb:
+              - 'vecdb/**'
+            exdata:
+              - 'exdata/**'
+
+  # Generic build/push/deploy job template repeated per service (kept explicit for clarity)
+  deploy-webapp:
+    needs: filter
+    if: needs.filter.outputs.webapp == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and push webapp image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./webapp
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/webapp:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/webapp:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/webapp:latest
+          cache-to: type=inline
+        env:
+          DOCKER_BUILDKIT: 1
+        with-secrets: {}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+      - name: Set image on deployment
+        run: |
+          kubectl set image deployment/webapp webapp=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/webapp:${{ github.sha }} --record || kubectl set image deployment/webapp webapp=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/webapp:latest --record
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/webapp --timeout=120s
+
+  deploy-docapp:
+    needs: filter
+    if: needs.filter.outputs.docapp == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push docapp image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./docapp
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/docapp:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/docapp:${{ github.sha }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+      - name: Set image on deployment
+        run: |
+          kubectl set image deployment/docapp docapp=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/docapp:${{ github.sha }} --record || kubectl set image deployment/docapp docapp=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/docapp:latest --record
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/docapp --timeout=120s
+
+  deploy-agent:
+    needs: filter
+    if: needs.filter.outputs.agent == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push agent image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./agent
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/agent:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/agent:${{ github.sha }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+      - name: Set image on deployment
+        run: |
+          kubectl set image deployment/agent agent=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/agent:${{ github.sha }} --record || kubectl set image deployment/agent agent=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/agent:latest --record
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/agent --timeout=120s
+
+  deploy-vecdb:
+    needs: filter
+    if: needs.filter.outputs.vecdb == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push vecdb image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./vecdb
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/vecdb:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/vecdb:${{ github.sha }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+      - name: Set image on deployment
+        run: |
+          kubectl set image deployment/vecdb vecdb=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/vecdb:${{ github.sha }} --record || kubectl set image deployment/vecdb vecdb=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/vecdb:latest --record
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/vecdb --timeout=120s
+
+  deploy-exdata:
+    needs: filter
+    if: needs.filter.outputs.exdata == 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push exdata image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./exdata
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/exdata:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/exdata:${{ github.sha }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+      - name: Set image on deployment
+        run: |
+          kubectl set image deployment/exdata exdata=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/exdata:${{ github.sha }} --record || kubectl set image deployment/exdata exdata=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/exdata:latest --record
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/exdata --timeout=120s

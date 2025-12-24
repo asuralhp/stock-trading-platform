@@ -1,6 +1,7 @@
 import Earth, { IndexData } from './components/Earth';
 import { fetchMarketIndices } from './api/marketIndice';
 import type { MarketIndexRecord } from './models/MarketIndex';
+import PopupAd from './components/PopupAd';
 
 const MARKET_COORDINATES: Record<string, { lat: number; lon: number }> = {
   'S&P 500': { lat: 40.7128, lon: -74.006 },
@@ -66,6 +67,7 @@ export default async function Home() {
 
   return (
     <div>
+      <PopupAd />
       <div style={{ height: '600px', width: '100%' }}>
         <Earth data={indices} />
       </div>

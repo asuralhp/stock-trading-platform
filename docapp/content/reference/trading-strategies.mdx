@@ -1,0 +1,34 @@
+---
+title: Trading Strategies
+---
+
+# Trading Strategies
+
+Leo's Stock employs a multi-faceted approach to trading, combining technical and fundamental analysis with AI.
+
+## AI Models
+
+### LSTM Price Prediction
+We utilize Long Short-Term Memory (LSTM) networks to predict future stock price movements based on historical sequences. The model is trained on years of daily price data.
+
+- **Input**: 60-day window of OHLCV data.
+- **Output**: Predicted closing price for the next day.
+
+### Sentiment Analysis
+Our sentiment analysis module uses Natural Language Processing (NLP) to analyze social media posts.
+
+- **Model**: Fine-tuned Transformer models (e.g., BERT/RoBERTa) or XGBoost classifiers.
+- **Features**: Text content, upvotes, comment count.
+- **Output**: Sentiment score (Bullish/Bearish).
+
+## Strategy Execution
+
+The `Agent` service evaluates signals from both models:
+
+1. **Signal Generation**:
+   - If LSTM predicts price > threshold AND Sentiment is Bullish -> **BUY**
+   - If LSTM predicts price < threshold AND Sentiment is Bearish -> **SELL**
+
+2. **Risk Management**:
+   - Stop-loss and Take-profit levels are automatically calculated.
+   - Position sizing is based on portfolio volatility.

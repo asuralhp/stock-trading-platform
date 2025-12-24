@@ -46,7 +46,7 @@ def ensure_initialized():
     
 def import_documents(path):
     # import mdx file
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding='utf-8') as file:
         mdx_content = file.read()
         
     text = mdx_content.split('\n')
@@ -99,7 +99,7 @@ def query_collection(question,n):
 if __name__ == "__main__":
     batch_process(GLOVAR.PATH_DOCUMENTS)
     print("Texts have been processed and stored in Chroma!")
-    question = "How many stationery does Mary have?"  
+    question = "What is the fee of buying Option?"  
     print("Test Querying Chroma for:", question)
     result = query_collection(question,4)
     print("Query result:", result)  

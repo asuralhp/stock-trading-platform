@@ -4,6 +4,12 @@ dotenv.config({ path: '.env.local' });
 export const ALPACA_API_KEY = process.env.ALPACA_API_KEY;
 export const ALPACA_API_SECRET = process.env.ALPACA_API_SECRET;
 
+export const POSTER_API_URL = process.env.NEXT_PUBLIC_POSTER_API_URL || 'http://localhost:3010';
+
+// MongoDB collections for global data
+export const MONGODB_DATABASE_GLOBAL_DATA = 'global_data';
+export const MONGODB_COLLECTION_GLOVAR = 'glovar';
+
 export const MONGODB_DATABASE_ACCOUNT_DATA = 'account_data';
 export const MONGODB_DATABASE_MARKET_DATA = 'market_data';
 

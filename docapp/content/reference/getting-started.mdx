@@ -1,0 +1,53 @@
+---
+title: Getting Started
+---
+
+# Getting Started
+
+This guide will help you set up the Leo's Stock environment on your local machine.
+
+## Prerequisites
+
+Ensure you have the following installed:
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Python 3.9+](https://www.python.org/downloads/)
+- [Node.js 18+](https://nodejs.org/)
+
+## Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/asuralhp/stock-trading-platform.git
+   cd stock-trading-platform
+   ```
+
+2. **Set up environment variables:**
+
+   Copy the example environment file and configure your API keys (OpenAI, Reddit, etc.).
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start the services:**
+
+   Use Docker Compose to spin up the database, backend, and frontend services.
+
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Initialize the Database:**
+
+   Run the initialization script to set up the database schema.
+
+   ```bash
+   cd db
+   python db_init.py
+   ```
+
+## Verification
+
+Visit `http://localhost:3000` to access the WebApp dashboard. You should see the system status and market overview.

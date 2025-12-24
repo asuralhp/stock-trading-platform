@@ -1,0 +1,33 @@
+---
+title: API Reference
+---
+
+# API Reference
+
+The Leo's Stock exposes a RESTful API for interacting with the system.
+
+## Base URL
+
+`http://localhost:8000/api/v1`
+
+## Endpoints
+
+### Market Data
+
+- `GET /market/quote/{symbol}`: Get real-time quote for a symbol.
+- `GET /market/history/{symbol}`: Get historical data.
+
+### Analysis
+
+- `POST /predict/price`: Get price prediction from LSTM model.
+- `POST /predict/sentiment`: Analyze sentiment of a text snippet.
+
+### Trading
+
+- `POST /orders`: Place a new order.
+- `GET /orders`: List all active orders.
+- `GET /portfolio`: Get current portfolio holdings.
+
+### System
+
+- `GET /health`: Check system health status.

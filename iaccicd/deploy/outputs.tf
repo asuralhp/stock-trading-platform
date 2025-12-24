@@ -1,6 +1,6 @@
 output "cluster_name" {
   description = "EKS cluster name"
-  value       = module.eks.cluster_id
+  value       = module.eks.cluster_name
 }
 
 output "cluster_endpoint" {
@@ -15,5 +15,5 @@ output "cluster_security_group_id" {
 
 output "kubeconfig_command" {
   description = "Command to populate kubeconfig for kubectl"
-  value       = "aws eks update-kubeconfig --region ${var.region} --name ${module.eks.cluster_id}"
+  value       = "aws eks update-kubeconfig --region ${var.region} --name ${module.eks.cluster_name}"
 }

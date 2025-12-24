@@ -58,11 +58,15 @@ export async function postOrder(formData: FormData) {
 export async function getOrders(symbol: string) {
     const session = await auth();
     const userUid = session?.user?.userUid;
+    
     if (!userUid) {
-        throw new Error("User not authenticated");
+        return [];
     }
+    
     const collection = await connect_collection(MONGODB_DATABASE_ACCOUNT_DATA, MONGODB_COLLECTION_ORDER);
-    const orders = await collection.find({ userUid: String(userUid), symbol: String(symbol) }).toArray();
+    const orders = await collection.find({ userUid: userUid, symbol: symbol }).toArray();
+    
+    console.log('[getOrders] userUid:', userUid, 'symbol:', symbol, 'found:', orders.length);
 
     // Convert MongoDB objects to plain JS objects
     return orders.map(order => ({
@@ -74,8 +78,7 @@ export async function getOrders(symbol: string) {
             : order.price,
         status: order.status,
         order_type: order.order_type,
-        order_date: order.order_date instanceof Date ? order.order_date.toISOString() : order.order_date,
-        // add other fields as needed
+        order_date: order.order_date instanceof Date ? order.order_date.toISOString() : String(order.order_date),
     }));
 }
 
@@ -86,18 +89,21 @@ export async function getStockTicker(symbol: string, timeUnit: TIME_UNIT): Promi
     // Try to get minute OHLC from DB first
     const tickers = await collection.find({ symbol: String(symbol) }).toArray();
     if (tickers && tickers.length > 0) {
-        return tickers.map(ticker => ({
-            symbol: ticker.symbol,
-            name: ticker.name,
-            price: typeof ticker.price === 'object' && ticker.price !== null && 'value' in ticker.price
-                ? ticker.price.value
-                : ticker.price,
-            Date: ticker.Date ?? ticker.date ?? null,
-            Open: ticker.Open ?? ticker.open ?? null,
-            Close: ticker.Close ?? ticker.close ?? null,
-            Low: ticker.Low ?? ticker.low ?? null,
-            High: ticker.High ?? ticker.high ?? null,
-        }));
+        return tickers.map(ticker => {
+            const dateValue = ticker.Date ?? ticker.date ?? null;
+            return {
+                symbol: ticker.symbol,
+                name: ticker.name,
+                price: typeof ticker.price === 'object' && ticker.price !== null && 'value' in ticker.price
+                    ? ticker.price.value
+                    : ticker.price,
+                Date: dateValue instanceof Date ? dateValue.toISOString() : String(dateValue ?? ''),
+                Open: ticker.Open ?? ticker.open ?? null,
+                Close: ticker.Close ?? ticker.close ?? null,
+                Low: ticker.Low ?? ticker.low ?? null,
+                High: ticker.High ?? ticker.high ?? null,
+            };
+        });
     }
 
     // If DB has no data, fetch previous day's 1-minute bars from Alpaca and insert into DB
@@ -168,7 +174,13 @@ export async function getStockTicker(symbol: string, timeUnit: TIME_UNIT): Promi
             }
         }
 
-        return docs.map(d => new TickerData(String(d.Date), Number(d.Open ?? 0), Number(d.Close ?? 0), Number(d.Low ?? 0), Number(d.High ?? 0)));
+        return docs.map(d => ({
+            Date: String(d.Date ?? ''),
+            Open: Number(d.Open ?? 0),
+            Close: Number(d.Close ?? 0),
+            Low: Number(d.Low ?? 0),
+            High: Number(d.High ?? 0),
+        }));
 
     } catch (err: any) {
         throw err;
@@ -181,7 +193,6 @@ export async function getTickerInfo(symbol: string) {
     if (!info) {
         return null;
     }
-    // Convert ObjectId and other BSON types to plain JSON-safe objects if needed
-    // We'll keep the shape as-is and let the client component handle field access safely.
-    return info;
+    // Convert to plain JSON-safe object
+    return JSON.parse(JSON.stringify(info));
 }

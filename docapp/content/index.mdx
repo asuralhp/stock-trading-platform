@@ -1,53 +1,43 @@
 ---
-title: Nextra Docs Starter
+title: Leo's Stock Documentation
 ---
 
-import {Steps, Cards} from 'nextra/components'
+import { Cards } from 'nextra/components'
 
-# Nextra Docs Starter
+# Welcome to Leo's Stock
 
-This starter template includes the following features:
+Leo's Stock is a comprehensive algorithmic trading solution powered by advanced AI and machine learning. Our platform integrates real-time market data, sentiment analysis, and predictive modeling to execute intelligent trading strategies.
+
+## Key Features
 
 <Cards>
-    <Cards.Card
-        icon={<img src="/images/next.svg" alt="Logo" width={28} height={28}/>}
-        title="Nextra 4"
-        href="https://nextra.site"
-    />
-    <Cards.Card
-        icon=""
-        title="Search with Pagefind"
-        href="https://the-guild.dev/blog/nextra-4#new-search-engine--pagefind"
-    />
+  <Cards.Card
+    title="AI-Driven Analysis"
+    href="/docs/trading-strategies"
+    children="Leverage LSTM and Sentiment Analysis models for market prediction."
+  />
+  <Cards.Card
+    title="Real-time Data"
+    href="/docs/market-data"
+    children="High-frequency data processing and visualization."
+  />
+  <Cards.Card
+    title="Automated Execution"
+    href="/docs/api-reference"
+    children="Seamless order execution and portfolio management."
+  />
 </Cards>
 
-[**Live Demo →**](https://nextra-docs-starter.vercel.app)
+## System Architecture
 
-[**Check this on GitHub →**](https://github.com/phucbm/nextra-docs-starter)
+The platform consists of several microservices:
 
-## Quick Start
+- **Agent**: The core trading bot that executes strategies.
+- **Model**: Machine learning models for price prediction and sentiment analysis.
+- **ExData**: External data collectors (Yahoo Finance, Reddit, etc.).
+- **RtData**: Real-time data processing pipeline.
+- **WebApp**: User interface for monitoring and control.
 
-You can deploy this template on Vercel by clicking the button below
+## Getting Started
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fphucbm%2Fnextra-docs-starter)
-
-Or you can follow the steps below to clone the repository and run it locally.
-
-<Steps>
-    ### Clone this repository
-
-    Using the GitHub CLI:
-    ```bash
-    gh repo clone phucbm/nextra-docs-starter
-    ```
-
-    ### Install
-    ```bash
-    pnpm i
-    ```
-
-    ### Run the development server
-    ```bash
-    pnpm dev
-    ```
-</Steps>
+Ready to start trading? Check out our [Getting Started](/docs/getting-started) guide to set up your environment.

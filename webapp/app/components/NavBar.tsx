@@ -16,7 +16,7 @@ function NavBar() {
     const navItems = [
             { href: '/', label: 'Home' },
             { href: '/stock', label: 'Stock' },
-            { href: '/about', label: 'About' },
+            { href: '/admin', label: 'Admin' },
             { href: '/user', label: 'User' },
             { href: '/api/guide', label: 'Guide' },
         ];

@@ -9,6 +9,19 @@ from pymongo import MongoClient, ASCENDING
 client = MongoClient('mongodb://localhost:27017/') 
 
 
+db_name = 'global_data'
+client.drop_database(db_name)
+db = client[db_name]
+glovar_collection_name = 'glovar'
+glovar_collection = db[glovar_collection_name]
+glovar_data = {
+    "app_name": "Stock Trading Platform",
+    "version": "1.0.0",
+    "poster_path": "C:\\Share\\HKIT\\stplatform\\sdapp\\output\\default_poster.png",
+}
+
+glovar_collection.insert_one(glovar_data)
+
 db_name = 'market_data'
 client.drop_database(db_name)
 db = client[db_name]

@@ -1,0 +1,36 @@
+---
+title: Market Data
+---
+
+# Market Data
+
+Leo's Stock aggregates data from multiple sources to provide a holistic view of the market.
+
+## Data Sources
+
+### Yahoo Finance
+We use the `yfinance` library to fetch historical price data and real-time quotes. This includes:
+- OHLCV (Open, High, Low, Close, Volume) data
+- Fundamental data (Balance Sheet, Income Statement)
+
+### Reddit & Social Media
+The `ExData` service scrapes discussions from subreddits like `r/wallstreetbets`, `r/stocks`, and `r/investing` to gauge retail investor sentiment.
+
+## Data Storage
+
+Data is stored in a MongoDB database for flexibility and scalability.
+
+- **`stock_prices`**: Historical price data.
+- **`sentiment_data`**: Processed sentiment scores from social media posts.
+- **`fundamental_data`**: Financial ratios and reports.
+
+## Accessing Data
+
+You can access the data via the internal API or directly through the database.
+
+```python
+from db.mongodb import get_db
+
+db = get_db()
+prices = db.stock_prices.find({'symbol': 'AAPL'})
+```

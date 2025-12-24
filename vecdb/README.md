@@ -8,6 +8,7 @@ python -m main
 
 
 ```
+python -m main
 docker build -t vecdb:latest .
 docker run --rm -p 3004:3004 --name vecdb vecdb:latest
 ```

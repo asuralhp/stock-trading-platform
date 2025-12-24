@@ -3,3 +3,4 @@ COMFYUI_API_URL = f"http://localhost:{COMFYUI_API_PORT}/prompt"  # Change if you
 COMFYUI_WORKFLOW = "workflow_ipo.json"
 # Use a raw string to avoid Python interpreting backslashes as escapes on Windows paths
 COMFYUI_OUTPUT = r"C:\Users\Lau\Documents\ComfyUI\output"
+PORT_SERVER = 3010

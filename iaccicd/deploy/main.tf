@@ -1,8 +1,23 @@
+terraform {
+  required_version = ">= 1.3"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.40"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "4.5.0"
+  version = "6.5.1"
 
   name = "${var.cluster_name}-vpc"
   cidr = "10.0.0.0/16"
@@ -16,22 +31,27 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.0.0"
+  version = "20.31.6"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
 
-  vpc_id   = module.vpc.vpc_id
-  subnets  = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
-  node_groups = {
+  # Enable cluster endpoint access
+  cluster_endpoint_public_access = true
+
+  # Use EKS managed node groups instead of self-managed (recommended)
+  eks_managed_node_groups = {
     default = {
-      desired_capacity = var.node_group_desired_capacity
-      min_capacity     = var.node_group_min
-      max_capacity     = var.node_group_max
-      instance_types   = [var.instance_type]
+      desired_size  = var.node_group_desired_capacity
+      min_size      = var.node_group_min
+      max_size      = var.node_group_max
+      instance_types = [var.instance_type]
+
+      # Use Amazon Linux 2023
+      ami_type = "AL2023_x86_64_STANDARD"
     }
   }
-
-  manage_aws_auth = true
 }

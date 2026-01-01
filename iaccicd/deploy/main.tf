@@ -42,16 +42,17 @@ module "eks" {
   # Enable cluster endpoint access
   cluster_endpoint_public_access = true
 
-  # Use EKS managed node groups instead of self-managed (recommended)
-  eks_managed_node_groups = {
+  # Use self-managed node groups (Auto Scaling Groups)
+  self_managed_node_groups = {
     default = {
-      desired_size  = var.node_group_desired_capacity
+      name          = "${var.cluster_name}-asg"
       min_size      = var.node_group_min
       max_size      = var.node_group_max
-      instance_types = [var.instance_type]
+      desired_size  = var.node_group_desired_capacity
+      instance_type = var.instance_type
 
-      # Use Amazon Linux 2023
-      ami_type = "AL2023_x86_64_STANDARD"
+      # Distribute ASG across the private subnets
+      subnet_ids = module.vpc.private_subnets
     }
   }
 }
